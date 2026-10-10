@@ -9,9 +9,10 @@ enum Palette {
     static let muted = Color(red: 0.66, green: 0.69, blue: 0.73)
 
     static func zone(_ id: Int) -> Color {
-        [blue, Color(red: 0.99, green: 0.88, blue: 0.65), Color(red: 1, green: 0.81, blue: 0.50),
-         coral, Color(red: 1, green: 0.46, blue: 0.28), Color(red: 0.96, green: 0.35, blue: 0.39),
-         Color(red: 0.84, green: 0.55, blue: 0.88), Color(red: 0.70, green: 0.61, blue: 1)][min(7, max(0, id))]
+        [Color(red: 0.67, green: 0.74, blue: 1), Color(red: 0.18, green: 0.55, blue: 1),
+         Color(red: 1, green: 0.80, blue: 0), Color(red: 1, green: 0.61, blue: 0.08),
+         Color(red: 1, green: 0.27, blue: 0.30), Color(red: 0.63, green: 0.36, blue: 1),
+         Color(red: 0.87, green: 0.39, blue: 0.86), Color(red: 1, green: 0.58, blue: 0.74)][min(7, max(0, id))]
     }
 }
 

@@ -145,9 +145,17 @@ final class BikeTrackUITests: XCTestCase {
         XCTAssertTrue(app.navigationBars["Heart rate"].waitForExistence(timeout: 5))
         capture(app, name: "Heart rate analysis")
         scrollGently(app)
+        XCTAssertTrue(app.otherElements["heartRateZoneScale"].exists)
+        capture(app, name: "Heart rate zone scale")
+        scrollGently(app)
         scrollGently(app)
         scrollGently(app)
         capture(app, name: "Heart rate zone distribution")
+        let ranges = app.buttons["heartRateZoneRanges"]
+        for _ in 0..<6 where !ranges.isHittable { scrollGently(app) }
+        XCTAssertTrue(ranges.isHittable)
+        ranges.tap()
+        XCTAssertTrue(app.staticTexts["<95 bpm"].waitForExistence(timeout: 5))
     }
 
     @MainActor

@@ -11,7 +11,7 @@ A lightweight, standalone Apple Watch app for tracking indoor bike sessions, bas
 - Combines equipment metrics with the Watch's heart rate and active energy.
 - Records indoor cycling, running, and walking workouts to HealthKit for Apple Fitness and Health.
 - Shows power, cadence, speed, distance, elapsed time, heart rate, and energy when available.
-- Shows live heart-rate and cycling power zones, with separate trend charts and time-in-zone breakdowns.
+- Shows live heart-rate and cycling power zones, with zone-colored charts, threshold scales, and time-in-zone breakdowns.
 - Saves chart data and each workout's maximum-heart-rate/FTP settings alongside local history.
 - Supports pause/resume, automatic reconnection, save retries, and active-workout recovery.
 - Retains the last 100 saved workout summaries locally.
@@ -23,9 +23,9 @@ No accounts, subscriptions, analytics SDKs, or app-operated server. Export to St
 
 <p>
   <img src="docs/screenshots/live-zones-small.png" width="160" alt="BikeTrack live heart-rate and power zones on a 40 mm Watch simulator">
-  <img src="docs/screenshots/heart-rate-trend-small.png" width="160" alt="Live heart-rate trend in demo mode">
-  <img src="docs/screenshots/power-trend-small.png" width="160" alt="Live cycling power trend in demo mode">
-  <img src="docs/screenshots/power-distribution-large.png" width="200" alt="Time spent in cycling power zones">
+  <img src="docs/screenshots/heart-rate-analysis-small.png" width="160" alt="Average heart rate and zone-colored workout chart">
+  <img src="docs/screenshots/zone-scale-small.png" width="160" alt="Heart-rate threshold scale and average position marker">
+  <img src="docs/screenshots/zone-distribution-small.png" width="160" alt="Time spent in heart-rate zones">
 </p>
 
 Actual watchOS simulator screenshots. Workout values shown here are simulated demo data.

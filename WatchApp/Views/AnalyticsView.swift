@@ -32,12 +32,32 @@ struct ZoneStrip: View {
 struct TrendChart: View {
     let timeline: MetricTimeline
     let metric: ZoneMetric
+    var profile = TrainingProfile()
     var compact = false
     var height: CGFloat = 90
     private var lower: Double { max(0, (timeline.points.map(\.value).min() ?? 0) - (metric == .heartRate ? 10 : 25)) }
     private var upper: Double { max(lower + 20, (timeline.points.map(\.value).max() ?? 100) + (metric == .heartRate ? 10 : 25)) }
 
+    private func zoneGradient(lower: Double, upper: Double, opacity: Double = 1) -> LinearGradient {
+        let zones = profile.zones(for: metric)
+        guard !zones.isEmpty else {
+            return LinearGradient(colors: [metric.tint.opacity(opacity), metric.tint.opacity(opacity)], startPoint: .bottom, endPoint: .top)
+        }
+        var stops = [Gradient.Stop(color: Palette.zone(profile.zone(for: max(1, lower), metric: metric)?.id ?? zones[0].id).opacity(opacity), location: 0)]
+        for (index, zone) in zones.enumerated() where index > 0 && zone.lowerBound > lower && zone.lowerBound < upper {
+            let location = (zone.lowerBound - lower) / (upper - lower)
+            stops.append(.init(color: Palette.zone(zones[index - 1].id).opacity(opacity), location: location))
+            stops.append(.init(color: Palette.zone(zone.id).opacity(opacity), location: location))
+        }
+        stops.append(.init(color: Palette.zone(profile.zone(for: upper, metric: metric)?.id ?? zones.last!.id).opacity(opacity), location: 1))
+        return LinearGradient(stops: stops, startPoint: .bottom, endPoint: .top)
+    }
+
     var body: some View {
+        let domainLow = lower
+        let domainHigh = upper
+        let lineGradient = zoneGradient(lower: domainLow, upper: domainHigh)
+        let areaGradient = zoneGradient(lower: domainLow, upper: domainHigh, opacity: 0.14)
         Group {
             if timeline.points.isEmpty {
                 VStack(spacing: 6) {
@@ -47,22 +67,23 @@ struct TrendChart: View {
             } else {
                 Chart {
                     ForEach(Array(timeline.points.enumerated()), id: \.offset) { _, point in
-                        AreaMark(x: .value("Active time", point.elapsed), yStart: .value("Base", lower), yEnd: .value(metric.title, point.value), series: .value("Segment", point.segment))
-                            .foregroundStyle(LinearGradient(colors: [metric.tint.opacity(0.25), metric.tint.opacity(0.01)], startPoint: .top, endPoint: .bottom))
+                        AreaMark(x: .value("Active time", point.elapsed), yStart: .value("Base", domainLow), yEnd: .value(metric.title, point.value), series: .value("Segment", point.segment))
+                            .foregroundStyle(areaGradient).alignsMarkStylesWithPlotArea()
                         LineMark(x: .value("Active time", point.elapsed), y: .value(metric.title, point.value), series: .value("Segment", point.segment))
-                            .foregroundStyle(metric.tint).lineStyle(StrokeStyle(lineWidth: 1.8, lineCap: .round))
+                            .foregroundStyle(lineGradient).alignsMarkStylesWithPlotArea()
+                            .lineStyle(StrokeStyle(lineWidth: 1.8, lineCap: .round))
                     }
                     if let last = timeline.points.last {
                         PointMark(x: .value("Active time", last.elapsed), y: .value(metric.title, last.value))
-                            .foregroundStyle(metric.tint).symbolSize(12)
+                            .foregroundStyle(profile.zone(for: last.value, metric: metric).map { Palette.zone($0.id) } ?? metric.tint).symbolSize(12)
                     }
                 }
-                .chartYScale(domain: lower...upper)
+                .chartYScale(domain: domainLow...domainHigh)
                 .chartXScale(domain: 0...max(1, timeline.points.last?.elapsed ?? 1))
                 .chartXAxis(.hidden)
                 .chartYAxis {
                     if !compact {
-                        AxisMarks(position: .leading, values: .automatic(desiredCount: 3)) { _ in
+                        AxisMarks(position: .trailing, values: .automatic(desiredCount: 3)) { _ in
                             AxisGridLine().foregroundStyle(.white.opacity(0.07))
                             AxisValueLabel().font(.system(size: 9)).foregroundStyle(Palette.muted)
                         }
@@ -103,8 +124,9 @@ struct LiveZoneView: View {
                             .accessibilityIdentifier("\(metric.rawValue)LiveZone")
                         ZoneStrip(profile: workout.analytics.profile, metric: metric, selected: zone?.id)
                     }
-                    TrendChart(timeline: workout.analytics.timeline(for: metric), metric: metric, height: 60)
+                    TrendChart(timeline: workout.analytics.timeline(for: metric), metric: metric, profile: workout.analytics.profile, height: 60)
                     chartTimeLabels(workout.analytics.timeline(for: metric))
+                    ZoneScale(profile: workout.analytics.profile, metric: metric, value: value).padding(.top, 8)
                     ZoneDistribution(analytics: workout.analytics, metric: metric, duration: workout.elapsed).padding(.top, 12)
                 }.padding(.horizontal, 4).padding(.bottom, 18)
             }.accessibilityIdentifier("\(metric.rawValue)Insights")
@@ -117,18 +139,34 @@ struct WorkoutInsightsView: View {
     let metric: ZoneMetric
     let duration: TimeInterval
     var body: some View {
+        let timeline = analytics.timeline(for: metric)
+        let averageZone = analytics.profile.zone(for: timeline.average, metric: metric)
         ScrollView {
-            VStack(alignment: .leading, spacing: 14) {
-                HStack {
-                    compactStat("Average", value: formatted(analytics.timeline(for: metric).average), unit: metric.unit, tint: metric.tint)
-                    Spacer()
-                    compactStat("Peak", value: formatted(analytics.timeline(for: metric).peak), unit: metric.unit, tint: .white)
-                }
-                VStack(spacing: 6) {
-                    TrendChart(timeline: analytics.timeline(for: metric), metric: metric)
-                    chartTimeLabels(analytics.timeline(for: metric))
-                }
+            VStack(alignment: .leading, spacing: 12) {
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack(alignment: .bottom, spacing: 4) {
+                        VStack(alignment: .leading, spacing: 3) {
+                            HStack(alignment: .firstTextBaseline, spacing: 2) {
+                                Text(formatted(timeline.average)).font(.system(size: 25, weight: .semibold, design: .rounded)).monospacedDigit()
+                                Text(metric.unit).font(.system(size: 10)).foregroundStyle(Palette.muted)
+                            }
+                            Text(metric == .heartRate ? "Average HR" : "Average power").font(.system(size: 10)).foregroundStyle(Palette.muted)
+                        }
+                        Spacer(minLength: 0)
+                        if let averageZone {
+                            Text(averageZone.label).font(.system(size: 10, weight: .semibold)).foregroundStyle(Palette.zone(averageZone.id))
+                        }
+                    }
+                    TrendChart(timeline: timeline, metric: metric, profile: analytics.profile, height: 65)
+                    chartTimeLabels(timeline)
+                    ZoneScale(profile: analytics.profile, metric: metric, value: timeline.average)
+                }.metricCard()
                 ZoneDistribution(analytics: analytics, metric: metric, duration: duration)
+                HStack {
+                    Text("Peak \(metric.title.lowercased())").font(.caption2).foregroundStyle(Palette.muted)
+                    Spacer(minLength: 3)
+                    Text("\(formatted(timeline.peak)) \(metric.unit)").font(.caption2).monospacedDigit()
+                }
             }.padding(.horizontal, 4).padding(.bottom, 12)
         }.navigationTitle(metric.title)
     }
@@ -138,6 +176,7 @@ struct ZoneDistribution: View {
     let analytics: WorkoutAnalytics
     let metric: ZoneMetric
     let duration: TimeInterval
+    @State private var showRanges = false
     private var timeline: MetricTimeline { analytics.timeline(for: metric) }
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -145,27 +184,55 @@ struct ZoneDistribution: View {
             if let baseline = analytics.profile.baseline(for: metric) {
                 Text("\(metric == .heartRate ? "Max HR" : "FTP") \(Int(baseline)) \(metric.unit)")
                     .font(.caption2).foregroundStyle(Palette.muted)
-                ForEach(analytics.profile.zones(for: metric)) { zone in
-                    let seconds = timeline.zoneSeconds[zone.id, default: 0]
-                    let fraction = timeline.recordedSeconds > 0 ? seconds / timeline.recordedSeconds : 0
-                    VStack(alignment: .leading, spacing: 5) {
-                        HStack {
-                            Text(zone.id == 0 ? "< Z1" : "Z\(zone.id)").foregroundStyle(Palette.zone(zone.id))
-                                .font(.system(size: 12, weight: .bold)).frame(width: 29, alignment: .leading)
-                            Text(MetricFormat.elapsed(seconds)).font(.system(size: 12, weight: .medium)).monospacedDigit()
-                            Spacer(minLength: 3)
-                            Text(String(format: "%.0f%%", fraction * 100)).font(.system(size: 10)).foregroundStyle(Palette.muted)
+                VStack(spacing: 0) {
+                    HStack {
+                        Text("Zone").frame(width: 25, alignment: .leading)
+                        Text("Duration")
+                        Spacer()
+                        Text("%")
+                    }.font(.system(size: 9, weight: .medium)).foregroundStyle(Palette.muted).padding(.bottom, 6)
+                    ForEach(analytics.profile.zones(for: metric)) { zone in
+                        let seconds = timeline.zoneSeconds[zone.id, default: 0]
+                        let fraction = timeline.recordedSeconds > 0 ? seconds / timeline.recordedSeconds : 0
+                        let longest = timeline.zoneSeconds.values.max() ?? 0
+                        let barFraction = longest > 0 ? seconds / longest : 0
+                        HStack(spacing: 5) {
+                            Text("\(zone.id)").foregroundStyle(Palette.zone(zone.id))
+                                .font(.system(size: 11, weight: .bold)).frame(width: 15, alignment: .leading)
+                            Text(MetricFormat.elapsed(seconds)).font(.system(size: 10, weight: .medium)).monospacedDigit()
+                                .frame(width: 40, alignment: .leading).minimumScaleFactor(0.7).lineLimit(1)
+                            GeometryReader { geometry in
+                                Capsule().fill(Palette.zone(zone.id)).frame(width: geometry.size.width * min(1, barFraction))
+                            }.frame(height: 5)
+                            Text(String(format: "%.0f%%", fraction * 100)).font(.system(size: 10)).monospacedDigit()
+                                .frame(width: 26, alignment: .trailing)
+                        }.foregroundStyle(seconds > 0 ? .white : Palette.muted.opacity(0.65)).padding(.vertical, 9)
+                            .accessibilityElement(children: .ignore)
+                            .accessibilityLabel("\(zone.label), \(zone.name)")
+                            .accessibilityValue("\(MetricFormat.elapsed(seconds)), \(Int((fraction * 100).rounded())) percent, \(zone.range) \(metric.unit)")
+                            .accessibilityIdentifier("\(metric.rawValue)ZoneRow\(zone.id)")
+                        if zone.id != analytics.profile.zones(for: metric).last?.id {
+                            Divider().overlay(.white.opacity(0.03))
                         }
-                        GeometryReader { geometry in
-                            Capsule().fill(Palette.zone(zone.id).opacity(0.10))
-                            Capsule().fill(Palette.zone(zone.id)).frame(width: geometry.size.width * min(1, fraction))
-                        }.frame(height: 5)
-                        Text("\(zone.name) · \(zone.range) \(metric.unit)")
-                            .font(.system(size: 9)).foregroundStyle(Palette.muted).fixedSize(horizontal: false, vertical: true)
-                    }.metricCard()
-                        .accessibilityElement(children: .ignore)
-                        .accessibilityLabel("\(zone.label), \(zone.name)")
-                        .accessibilityValue("\(MetricFormat.elapsed(seconds)), \(Int((fraction * 100).rounded())) percent, \(zone.range) \(metric.unit)")
+                    }
+                }.metricCard()
+                Button {
+                    showRanges.toggle()
+                } label: {
+                    HStack {
+                        Text("Zone ranges")
+                        Spacer()
+                        Image(systemName: showRanges ? "chevron.up" : "chevron.down")
+                    }.font(.system(size: 11))
+                }.accessibilityIdentifier("\(metric.rawValue)ZoneRanges")
+                if showRanges {
+                    ForEach(analytics.profile.zones(for: metric)) { zone in
+                        HStack {
+                            Text("Z\(zone.id)").foregroundStyle(Palette.zone(zone.id))
+                            Spacer(minLength: 3)
+                            Text("\(zone.range) \(metric.unit)")
+                        }.font(.system(size: 10)).padding(.vertical, 3)
+                    }
                 }
                 Text("Percent of recorded \(metric.title.lowercased()) time. Pauses are excluded.")
                     .font(.caption2).foregroundStyle(Palette.muted)
@@ -178,6 +245,57 @@ struct ZoneDistribution: View {
                 Spacer()
                 Text(MetricFormat.elapsed(max(0, duration - timeline.recordedSeconds))).font(.caption2).monospacedDigit()
             }.foregroundStyle(Palette.muted)
+        }
+    }
+}
+
+/// Equal-width bands match the reference's readable legend. The marker's
+/// position within a band reflects the value within that band's numeric range.
+struct ZoneScale: View {
+    let profile: TrainingProfile
+    let metric: ZoneMetric
+    let value: Double?
+    private var zones: [TrainingZone] { profile.zones(for: metric) }
+
+    private var position: Double? {
+        guard let value, let current = profile.zone(for: value, metric: metric),
+              let index = zones.firstIndex(where: { $0.id == current.id }),
+              let baseline = profile.baseline(for: metric) else { return nil }
+        let upper = current.upperBound ?? baseline * (metric == .heartRate ? 1 : 2)
+        let fraction = min(1, max(0, (value - current.lowerBound) / max(1, upper - current.lowerBound)))
+        return (Double(index) + fraction) / Double(zones.count)
+    }
+
+    var body: some View {
+        if !zones.isEmpty {
+            VStack(spacing: 4) {
+                HStack(spacing: 1) {
+                    ForEach(zones) { zone in
+                        Text("Z\(zone.id)").font(.system(size: 9, weight: .semibold))
+                            .foregroundStyle(Palette.zone(zone.id)).frame(maxWidth: .infinity)
+                    }
+                }
+                GeometryReader { geometry in
+                    HStack(spacing: 1) {
+                        ForEach(zones) { zone in Rectangle().fill(Palette.zone(zone.id)) }
+                    }.clipShape(Capsule())
+                    if let position {
+                        Circle().fill(Palette.panel).overlay(Circle().strokeBorder(.white, lineWidth: 1.5))
+                            .frame(width: 7, height: 7)
+                            .offset(x: min(geometry.size.width - 7, max(0, geometry.size.width * position - 3.5)), y: -0.5)
+                    }
+                }.frame(height: 6)
+                HStack(spacing: 1) {
+                    ForEach(zones) { zone in
+                        Text("\(formatted(zone.lowerBound))\(zone.upperBound == nil ? "+" : "")")
+                            .font(.system(size: 7)).monospacedDigit().foregroundStyle(Palette.muted)
+                            .minimumScaleFactor(0.6).lineLimit(1).frame(maxWidth: .infinity)
+                    }
+                }
+            }.accessibilityElement(children: .ignore)
+                .accessibilityLabel("\(metric.title) zone scale")
+                .accessibilityValue(profile.zone(for: value, metric: metric)?.label ?? "No current value")
+                .accessibilityIdentifier("\(metric.rawValue)ZoneScale")
         }
     }
 }

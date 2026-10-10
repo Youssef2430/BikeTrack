@@ -2,6 +2,16 @@
 
 Executed locally on October 10, 2026 with Xcode 27.0 (27A266a), Swift 6.4, and the watchOS 27.0 SDK/runtime. The deployment target is watchOS 11; older runtimes have not been exercised.
 
+## Reference layout and physical installation
+
+The reference-inspired analysis now includes zone-colored lines and area fills, an average-zone label, threshold bands with a value marker, and a compact duration/bar/percentage table. The exact zone ranges expand on demand.
+
+The two focused 40 mm simulator UI tests passed: both live charts through saved analysis, and demo pause/resume/end/return home (`build-reference/ReferenceUIFixed.xcresult`). After the final chart-gradient optimization, the chart flow passed again with assertions for the threshold scale and expanded range labels (`build-reference/FinalReference.xcresult`). Final screenshots were captured in a successful repeat of that flow (`build-reference/ReferenceScreens.xcresult`); the updated `*-small.png` chart/zone captures show the reference layout with synthetic demo values. The final unsigned device Release build also passed.
+
+BikeTrack 1.0 (1), bundle `com.biketrack.watchapp`, was then signed, installed, and launched on a physical **Apple Watch Series 11 running watchOS 27.2**. Xcode reported the app running on the Watch, and `devicectl` confirmed the installation. The embedded development profile includes HealthKit and the connected Watch. Initial signing was blocked by a pending Apple Developer Program License Agreement; installation succeeded after the account holder accepted it and Xcode refreshed provisioning.
+
+This physical check establishes installation and launch only. A real equipment-connected workout, optical heart-rate recording, background operation, and Fitness synchronization remain to be validated below.
+
 ## Training zones and design refresh
 
 The current BikeTrack bundle (`com.biketrack.watchapp`) was verified on watchOS 27 simulators:
@@ -55,6 +65,6 @@ Local result bundles (ignored by version control):
 
 No Bowflex IC SE, Bowflex C6, or Schwinn IC4 was connected during development. Their Bluetooth advertisements, firmware-specific payloads, available metrics, and reconnect behavior remain unverified. Standard protocol parsing and simulator tests cannot establish model compatibility.
 
-Optical heart rate, real active-energy estimates, wrist-down/background operation, battery consumption, connection loss, crash recovery, and phone Fitness synchronization require an on-wrist session. A successful unsigned build does not install the app on a Watch: select an Apple development team and sign it in Xcode first.
+Optical heart rate, real active-energy estimates, wrist-down/background operation, battery consumption, connection loss, crash recovery, and phone Fitness synchronization require an on-wrist session. The signed physical installation above is ready for these checks; simulator results do not establish their outcome.
 
 Use [HARDWARE-VALIDATION.md](HARDWARE-VALIDATION.md) for those checks. This record establishes the tested scope; it is not a claim of perfect operation on untested equipment.

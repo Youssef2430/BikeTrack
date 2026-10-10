@@ -2,6 +2,10 @@
 
 Both heart-rate and cycling power zones appear on the main workout screen. Swipe left to see the individual metric's chart and scroll for time in each zone. Saved summaries and History retain the same charts and distributions.
 
+The workout analysis follows the supplied reference: average and average-zone label, a line colored by the zone at each height, a segmented threshold scale with a position marker, and a compact duration/percentage table. The dark cards and scrollable layout fit the Watch. The same colors are used for live badges, charts, scales, and table bars.
+
+Scale bands have equal widths for readability; the marker interpolates within its current band's numeric range. Threshold labels are rounded for the small display; **Zone ranges** expands the precise inclusive/exclusive limits. Table bars are relative to the longest observed zone duration, while percentages use all recorded time for that metric. Zero-duration zones have no bar.
+
 ## Your profile
 
 Open **Training zones** from Home or Settings. Explicitly save your measured maximum heart rate and cycling functional threshold power (FTP). The picker offers a starting position, but no value becomes a personal setting until you press Save. Clear a value to disable that zone scale. There is no age-based estimate or silent default for real workouts.

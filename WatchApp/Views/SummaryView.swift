@@ -55,7 +55,7 @@ struct SummaryView: View {
                     Text(formatted(analytics.timeline(for: metric).average)).font(.system(size: 26, weight: .semibold, design: .rounded))
                     Text("\(metric.unit) avg").font(.system(size: 10)).foregroundStyle(Palette.muted)
                 }
-                TrendChart(timeline: analytics.timeline(for: metric), metric: metric, compact: true)
+                TrendChart(timeline: analytics.timeline(for: metric), metric: metric, profile: analytics.profile, compact: true)
                 Text("Explore zones").font(.system(size: 10)).foregroundStyle(Palette.muted)
             }.metricCard()
         }.buttonStyle(.plain).accessibilityIdentifier("\(metric.rawValue)SummaryChart")
