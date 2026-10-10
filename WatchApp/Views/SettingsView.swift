@@ -32,12 +32,34 @@ struct SettingsView: View {
                     .font(.caption2).foregroundStyle(Palette.muted)
             }
             Section("BikeTrack 1.0") {
+                NavigationLink("Privacy policy") { PrivacyPolicyView() }
+                    .accessibilityIdentifier("privacyPolicy")
                 Text("Free to use. No accounts. No subscriptions. Your workouts stay on your devices and in Apple Health.")
                     .font(.footnote).foregroundStyle(Palette.muted)
                 Text("Connects to standard FTMS, Cycling Power, and Cycling Speed & Cadence services. Equipment must broadcast compatible data.")
                     .font(.caption2).foregroundStyle(Palette.muted)
             }
         }.navigationTitle("Settings")
+    }
+}
+
+struct PrivacyPolicyView: View {
+    private var policy: String {
+        guard let url = Bundle.main.url(forResource: "PrivacyPolicy", withExtension: "txt"),
+              let text = try? String(contentsOf: url, encoding: .utf8) else {
+            return "Read the BikeTrack privacy policy at https://youssef2430.github.io/BikeTrack/privacy.html"
+        }
+        return text
+    }
+
+    var body: some View {
+        ScrollView {
+            Text(policy)
+                .font(.footnote)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 4)
+        }
+        .navigationTitle("Privacy policy")
     }
 }
 

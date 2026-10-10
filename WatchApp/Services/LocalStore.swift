@@ -7,7 +7,7 @@ final class LocalStore: ObservableObject {
     static let shared = LocalStore()
     @Published private(set) var history: [WorkoutRecord] = []
     @Published private(set) var storageError: String?
-    private let logger = Logger(subsystem: "com.biketrack.watchapp", category: "storage")
+    private let logger = Logger(subsystem: "com.youssefchouay.biketrack.watchapp", category: "storage")
     let directory: URL
 
     init(directory: URL? = nil) {

@@ -11,11 +11,13 @@
 		1E1F422F80FB9D36E005EAFB /* TrainingSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DAD28A8C69FC6CF3C7AE0F8 /* TrainingSettings.swift */; };
 		233FD797C085284CD86C373C /* Phosphor-LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = 3F0D13C11D54E16351F75337 /* Phosphor-LICENSE.txt */; };
 		304C6FCFBF5C861B5685E264 /* HealthPersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09256E4AB951C7A15D6C4490 /* HealthPersistenceTests.swift */; };
+		3D35728DFF98E4A9799C1FEA /* BikeTrack.app in Embed Dependencies */ = {isa = PBXBuildFile; fileRef = 979205327CB4821938DF1593 /* BikeTrack.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		4DA98ED0AF4FC7549D70986D /* AnalyticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A7B339F8DF1FFD865BE7E03 /* AnalyticsView.swift */; };
 		6B35B85E7108CAE8E767C61A /* BluetoothManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 294B109D21DAAAABD2B0866B /* BluetoothManager.swift */; };
 		6CDCC252EEA628AC7A200E79 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5416106C65272D4CB783C12A /* RootView.swift */; };
 		6D8F747D61892700F357537A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7144CA8F8849116705C2A275 /* Assets.xcassets */; };
 		71369E233602F1AA134A6CC7 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D0B0F73C3F4F5845D617268 /* SettingsView.swift */; };
+		7387CC5356643070FC6EC34B /* PrivacyPolicy.txt in Resources */ = {isa = PBXBuildFile; fileRef = 88A7F75C4D6E535E100217F0 /* PrivacyPolicy.txt */; };
 		7E75990BA7BA1F8FE2D163A3 /* WorkoutController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AEDB7BFD544B88E6826317B /* WorkoutController.swift */; };
 		90C31D1BE366725989514FCF /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = B559D05AB23051E3C11AD623 /* PrivacyInfo.xcprivacy */; };
 		933898E37F34709CDA3B6F7A /* WorkoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E910FF1EDB661FD33B1950B /* WorkoutView.swift */; };
@@ -26,6 +28,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		0CF9406BAAF55A4DCFB7F80A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9191A5818D7C4DC7489F1167 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0D09E7A96AA0A9BB1E300BF2;
+			remoteInfo = BikeTrack;
+		};
 		2DDB0FFB2037D0BC7699CD46 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 9191A5818D7C4DC7489F1167 /* Project object */;
@@ -42,6 +51,20 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		9331CEA61D74AA6D2FDE88F6 /* Embed Dependencies */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				3D35728DFF98E4A9799C1FEA /* BikeTrack.app in Embed Dependencies */,
+			);
+			name = "Embed Dependencies";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		09256E4AB951C7A15D6C4490 /* HealthPersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthPersistenceTests.swift; sourceTree = "<group>"; };
 		0F6066C5291D0E409EC7B854 /* LocalStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalStore.swift; sourceTree = "<group>"; };
@@ -57,8 +80,10 @@
 		5FC24B0C49DDAF46A97C9DBB /* BikeTrackTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BikeTrackTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		6AEDB7BFD544B88E6826317B /* WorkoutController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutController.swift; sourceTree = "<group>"; };
 		7144CA8F8849116705C2A275 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		88A7F75C4D6E535E100217F0 /* PrivacyPolicy.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = PrivacyPolicy.txt; sourceTree = "<group>"; };
 		95FFA7CA7623D8564EBC7525 /* SummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryView.swift; sourceTree = "<group>"; };
 		979205327CB4821938DF1593 /* BikeTrack.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BikeTrack.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A8388D6C12F6DE53235EA813 /* BikeTrackStore.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = BikeTrackStore.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B27A1894C22D99EEC729DBC8 /* BikeTrack.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BikeTrack.entitlements; sourceTree = "<group>"; };
 		B559D05AB23051E3C11AD623 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		BB2AAEEAEA196FA0837755D3 /* BikeTrackApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BikeTrackApp.swift; sourceTree = "<group>"; };
@@ -82,6 +107,7 @@
 			isa = PBXGroup;
 			children = (
 				3F0D13C11D54E16351F75337 /* Phosphor-LICENSE.txt */,
+				88A7F75C4D6E535E100217F0 /* PrivacyPolicy.txt */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -102,6 +128,7 @@
 			isa = PBXGroup;
 			children = (
 				979205327CB4821938DF1593 /* BikeTrack.app */,
+				A8388D6C12F6DE53235EA813 /* BikeTrackStore.app */,
 				5FC24B0C49DDAF46A97C9DBB /* BikeTrackTests.xctest */,
 				F138E83C6A8E906C19D88594 /* BikeTrackUITests.xctest */,
 			);
@@ -228,6 +255,25 @@
 			productReference = 5FC24B0C49DDAF46A97C9DBB /* BikeTrackTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		C0A3E72E55B350FD9C675C04 /* BikeTrackStore */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2AF10481016795CC5E78D8E7 /* Build configuration list for PBXNativeTarget "BikeTrackStore" */;
+			buildPhases = (
+				8875B2F9F7444BCEDB26A202 /* Sources */,
+				9331CEA61D74AA6D2FDE88F6 /* Embed Dependencies */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				FEE3FF224E82B114FB6C718F /* PBXTargetDependency */,
+			);
+			name = BikeTrackStore;
+			packageProductDependencies = (
+			);
+			productName = BikeTrackStore;
+			productReference = A8388D6C12F6DE53235EA813 /* BikeTrackStore.app */;
+			productType = "com.apple.product-type.application.watchapp2-container";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -247,6 +293,10 @@
 						TestTargetID = 0D09E7A96AA0A9BB1E300BF2;
 					};
 					472A00CB4035395938EEBF78 = {
+						DevelopmentTeam = 7C45645JW6;
+						ProvisioningStyle = Automatic;
+					};
+					C0A3E72E55B350FD9C675C04 = {
 						DevelopmentTeam = 7C45645JW6;
 						ProvisioningStyle = Automatic;
 					};
@@ -270,6 +320,7 @@
 			projectRoot = "";
 			targets = (
 				0D09E7A96AA0A9BB1E300BF2 /* BikeTrack */,
+				C0A3E72E55B350FD9C675C04 /* BikeTrackStore */,
 				472A00CB4035395938EEBF78 /* BikeTrackTests */,
 				276C639FAF29E73BA39E08EE /* BikeTrackUITests */,
 			);
@@ -284,6 +335,7 @@
 				6D8F747D61892700F357537A /* Assets.xcassets in Resources */,
 				233FD797C085284CD86C373C /* Phosphor-LICENSE.txt in Resources */,
 				90C31D1BE366725989514FCF /* PrivacyInfo.xcprivacy in Resources */,
+				7387CC5356643070FC6EC34B /* PrivacyPolicy.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -303,6 +355,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				304C6FCFBF5C861B5685E264 /* HealthPersistenceTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8875B2F9F7444BCEDB26A202 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -335,6 +394,11 @@
 			isa = PBXTargetDependency;
 			target = 0D09E7A96AA0A9BB1E300BF2 /* BikeTrack */;
 			targetProxy = 2DDB0FFB2037D0BC7699CD46 /* PBXContainerItemProxy */;
+		};
+		FEE3FF224E82B114FB6C718F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0D09E7A96AA0A9BB1E300BF2 /* BikeTrack */;
+			targetProxy = 0CF9406BAAF55A4DCFB7F80A /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -391,12 +455,30 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = watchos;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_STRICT_CONCURRENCY = targeted;
 				SWIFT_VERSION = 5.0;
 				WATCHOS_DEPLOYMENT_TARGET = 11.0;
+			};
+			name = Release;
+		};
+		67CF7C363D9C522B8D11B4AC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = BikeTrack;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.youssefchouay.biketrack;
+				PRODUCT_NAME = BikeTrackStore;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
@@ -418,6 +500,25 @@
 			};
 			name = Debug;
 		};
+		77605DCBF3BA12B67E073D31 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = BikeTrack;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.youssefchouay.biketrack;
+				PRODUCT_NAME = BikeTrackStore;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
 		7F6F12016309F37688BA4C15 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -425,7 +526,7 @@
 				CODE_SIGN_ENTITLEMENTS = WatchApp/BikeTrack.entitlements;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = WatchApp/Info.plist;
-				PRODUCT_BUNDLE_IDENTIFIER = com.biketrack.watchapp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.youssefchouay.biketrack.watchapp;
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = 4;
@@ -457,7 +558,7 @@
 				CODE_SIGN_ENTITLEMENTS = WatchApp/BikeTrack.entitlements;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = WatchApp/Info.plist;
-				PRODUCT_BUNDLE_IDENTIFIER = com.biketrack.watchapp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.youssefchouay.biketrack.watchapp;
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = 4;
@@ -541,7 +642,6 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = watchos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_STRICT_CONCURRENCY = targeted;
@@ -571,6 +671,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		2AF10481016795CC5E78D8E7 /* Build configuration list for PBXNativeTarget "BikeTrackStore" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				77605DCBF3BA12B67E073D31 /* Debug */,
+				67CF7C363D9C522B8D11B4AC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
 		56B0CA8C226AB9777A54601F /* Build configuration list for PBXNativeTarget "BikeTrackTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

@@ -49,6 +49,28 @@ For your Watch:
 
 The simulator can exercise the UI and persistence but cannot validate real Bluetooth accessories, optical heart rate, on-wrist background behavior, or actual Fitness synchronization.
 
+## App Store release
+
+The App Store listing is **BikeTrack: Indoor Workouts** ([App Store Connect](https://appstoreconnect.apple.com/apps/6821473626/distribution)). The shorter name was already taken. The Watch continues to display **BikeTrack**.
+
+Use the **BikeTrackStore** scheme to archive the watch-only app with Apple's required iOS distribution container. Use **BikeTrack** for Watch development and tests. Both targets use version `1.0.0` and build `1` from `project.yml`.
+
+```sh
+xcodebuild -project BikeTrack.xcodeproj -scheme BikeTrackStore \
+  -configuration Release -destination 'generic/platform=iOS' \
+  -archivePath build-release/BikeTrack.xcarchive \
+  -derivedDataPath build-release/DerivedData -allowProvisioningUpdates archive
+xcodebuild -exportArchive -archivePath build-release/BikeTrack.xcarchive \
+  -exportPath build-release/export -exportOptionsPlist ExportOptions.plist \
+  -allowProvisioningUpdates
+```
+
+Distribution requires a signed-in paid Apple Developer account in Xcode and suitable signing certificates/profiles. A successful unsigned archive is not an uploadable release.
+
+The container's bundle ID is `com.youssefchouay.biketrack`; the embedded Watch app uses `com.youssefchouay.biketrack.watchapp`. These replace the development-only identifier `com.biketrack.watchapp` because its required parent identifier was unavailable. Existing sideloaded installations remain separate; their local history is not migrated to the store app.
+
+Store copy and actual 416 × 496 Watch simulator captures are in `AppStore/`. Screenshot workout readings are labeled demo data. The public [privacy policy](https://youssef2430.github.io/BikeTrack/privacy.html) and [support page](https://youssef2430.github.io/BikeTrack/support.html) are served by GitHub Pages from `main:/docs`; the policy is also bundled under Settings on the Watch.
+
 ## Equipment compatibility
 
 The intended initial bikes are **Bowflex IC SE, Bowflex C6, and Schwinn IC4**, matching the developer's reference post. The app implements their expected standard service families. **These models have not yet been physically verified with this implementation.** The original app's compatibility report is not evidence that this new implementation has passed testing on those bikes.

@@ -1,0 +1,26 @@
+BikeTrack Privacy Policy
+Effective October 10, 2026
+
+BikeTrack is developed by Youssef Chouay. The app has no account system, advertising, tracking, analytics SDK, or developer-operated server. BikeTrack does not automatically send your workout data to the developer or third parties.
+
+Health and fitness
+With your permission, BikeTrack reads heart rate, active energy, workouts, and supported cycling or running measurements from Apple Health to record and display your sessions. It writes workouts and authorized heart-rate, energy, distance, speed, power, and cadence samples to Apple Health. Apple manages Health storage and synchronization according to your device and iCloud settings. The developer cannot access that Health data. Health information is not used for advertising or sold.
+
+Bluetooth equipment
+BikeTrack receives compatible equipment measurements directly over Bluetooth. It remembers the selected equipment identifier on your Watch for reconnection. Availability of individual measurements depends on the equipment.
+
+Local storage and retention
+BikeTrack stores your settings, training thresholds, the latest 100 workout summaries and their chart data, and an unfinished workout checkpoint in its app storage on your Watch. Older summaries are removed as new ones are saved. Completed or discarded sessions clear their local recovery checkpoint. System backups may include app data according to your Apple settings.
+
+Your choices and deletion
+You can change BikeTrack's Health permissions in Apple Health and its Bluetooth permission in device privacy settings. Removing BikeTrack removes its local app data; restored device backups may restore it. Workouts already saved in Apple Health remain until you delete them there. Manage Health backups and synchronization through Apple's settings. Demo rides never write workouts to Health or local history.
+
+Optional diagnostics
+Diagnostic capture is off by default. When enabled, up to 150 connection events and packet-structure messages are kept in memory. These logs omit heart-rate values and raw measurement packets. Clear log removes them. Nothing is uploaded automatically. Share diagnostics sends the displayed text only through the destination you choose; that service's privacy practices apply.
+
+Support and external pages
+If you contact the developer or share a diagnostic log, you choose what to disclose. The recipient receives that information through the service you select. GitHub hosts the public support and policy pages under its own privacy policy. GitHub issues are public: do not post private health data or personal details there.
+
+Changes and contact
+This policy will be updated if the app's data practices change. For questions, visit https://github.com/Youssef2430/BikeTrack/issues.
+The current policy is also available at https://youssef2430.github.io/BikeTrack/privacy.html.

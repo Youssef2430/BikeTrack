@@ -16,6 +16,26 @@ packages:
   RideCore:
     path: .
 targets:
+  BikeTrackStore:
+    type: application.watchapp2-container
+    platform: iOS
+    deploymentTarget: '18.0'
+    dependencies:
+      - target: BikeTrack
+        embed: true
+        link: false
+        copy:
+          destination: productsDirectory
+          subpath: $(CONTENTS_FOLDER_PATH)/Watch
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.youssefchouay.biketrack
+        PRODUCT_NAME: BikeTrackStore
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: BikeTrack
+        INFOPLIST_KEY_ITSAppUsesNonExemptEncryption: NO
+        TARGETED_DEVICE_FAMILY: '1,2'
+        SKIP_INSTALL: NO
   BikeTrack:
     type: application
     platform: watchOS
@@ -24,14 +44,18 @@ targets:
       - package: RideCore
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.biketrack.watchapp
+        PRODUCT_BUNDLE_IDENTIFIER: com.youssefchouay.biketrack.watchapp
         TARGETED_DEVICE_FAMILY: '4'
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ENABLE_PREVIEWS: YES
+        SKIP_INSTALL: YES
     info:
       path: WatchApp/Info.plist
       properties:
         CFBundleDisplayName: BikeTrack
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        ITSAppUsesNonExemptEncryption: false
         WKApplication: true
         WKWatchOnly: true
         WKBackgroundModes: [workout-processing]
@@ -63,6 +87,12 @@ targets:
         GENERATE_INFOPLIST_FILE: YES
         PRODUCT_BUNDLE_IDENTIFIER: com.biketrack.tests
 schemes:
+  BikeTrackStore:
+    build:
+      targets:
+        BikeTrackStore: all
+    archive:
+      config: Release
   BikeTrack:
     build:
       targets:

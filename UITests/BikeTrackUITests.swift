@@ -7,6 +7,24 @@ final class BikeTrackUITests: XCTestCase {
     }
 
     @MainActor
+    func testBundledPrivacyPolicyIsAccessible() throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["--uitesting"]
+        app.launch()
+        let settings = app.buttons["settings"]
+        for _ in 0..<7 where !settings.isHittable { app.swipeUp() }
+        XCTAssertTrue(settings.isHittable)
+        settings.tap()
+        let privacy = app.buttons["privacyPolicy"]
+        for _ in 0..<12 where !privacy.isHittable { app.swipeUp() }
+        XCTAssertTrue(privacy.isHittable)
+        privacy.tap()
+        XCTAssertTrue(app.navigationBars["Privacy policy"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts.containing(NSPredicate(format: "label CONTAINS %@", "BikeTrack Privacy Policy")).firstMatch.exists)
+        capture(app, name: "Privacy policy")
+    }
+
+    @MainActor
     func testHealthWorkoutLifecycleInSimulator() throws {
         #if !targetEnvironment(simulator)
         throw XCTSkip("This test creates a workout only in the isolated simulator Health store.")

@@ -1,0 +1,24 @@
+{
+  "appStoreConnectId": "6821473626",
+  "appStoreConnectUrl": "https://appstoreconnect.apple.com/apps/6821473626/distribution",
+  "status": "Prepare for Submission",
+  "buildUploaded": false,
+  "submittedForReview": false,
+  "privacyPolicyUrl": "https://youssef2430.github.io/BikeTrack/privacy.html",
+  "supportUrl": "https://youssef2430.github.io/BikeTrack/support.html",
+  "listingCreated": true,
+  "metadataSaved": true,
+  "reviewContactComplete": false,
+  "privacyLabelPublished": true,
+  "ageRating": "9+",
+  "screenshotsPrepared": 5,
+  "screenshotsUploaded": 0,
+  "unsignedArchiveVerified": true,
+  "coreTestsPassed": 36,
+  "uiTestsPassed": 3,
+  "blockers": [
+    "Xcode automatic signing reports No Accounts. Sign in to Apple Developer in Xcode Settings > Accounts.",
+    "App Review requires a contact phone number (including country code) and email.",
+    "Chrome browser extension file upload reports Not allowed. Enable Allow access to file URLs or upload the prepared PNGs manually."
+  ]
+}

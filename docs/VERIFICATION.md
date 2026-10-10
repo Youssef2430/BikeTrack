@@ -2,6 +2,21 @@
 
 Executed locally on October 10, 2026 with Xcode 27.0 (27A266a), Swift 6.4, and the watchOS 27.0 SDK/runtime. The deployment target is watchOS 11; older runtimes have not been exercised.
 
+## App Store preparation
+
+The release now has a `BikeTrackStore` watch-only distribution container and a consistent `1.0.0 (1)` version across both bundles. The store identifiers are `com.youssefchouay.biketrack` and `com.youssefchouay.biketrack.watchapp`; the previous development installation uses a separate identifier.
+
+Release preparation checks on October 10, 2026:
+
+- Core package: all 36 tests passed.
+- Demo pause/resume/end/return-home UI test: passed in `build-release-tests/ReleaseUI.xcresult`.
+- Live charts, saved analysis, and bundled privacy-policy navigation: both tests passed in `build-release-tests/StoreScreens.xcresult`, with no skips or runtime warnings.
+- Final unsigned store archive: passed in `build-release/BikeTrack-unsigned.xcarchive`; the archive contains one iOS watch-only container and its embedded Watch app, matching version/build values, the privacy manifest, and the offline policy.
+- Five store screenshots were exported from successful simulator tests, visually checked, and verified as opaque 416 × 496 PNGs. Values in the workout screenshots are simulated demo data.
+- Public privacy and support pages returned HTTP 200 after GitHub Pages deployment.
+
+The unsigned archive is not a signed, uploadable release. Automatic signing/export currently fails because Xcode reports “No Accounts”; the account must be authenticated and appropriate development/distribution provisioning must be generated. No App Store upload or submission is established by these checks.
+
 ## Reference layout and physical installation
 
 The reference-inspired analysis now includes zone-colored lines and area fills, an average-zone label, threshold bands with a value marker, and a compact duration/bar/percentage table. The exact zone ranges expand on demand.
