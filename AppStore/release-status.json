@@ -20,5 +20,7 @@
     "Xcode automatic signing reports No Accounts. Sign in to Apple Developer in Xcode Settings > Accounts.",
     "App Review requires a contact phone number (including country code) and email.",
     "Chrome browser extension file upload reports Not allowed. Enable Allow access to file URLs or upload the prepared PNGs manually."
-  ]
+  ],
+  "priceConfigured": "Free",
+  "availabilityConfigured": "All 175 countries or regions, available on app release"
 }
