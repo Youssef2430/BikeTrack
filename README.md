@@ -1,5 +1,7 @@
 # BikeTrack
 
+<img src="favicon.svg" width="72" height="72" alt="BikeTrack icon" align="right">
+
 A lightweight, standalone Apple Watch app for tracking indoor bike sessions, based on the feature brief in the [CaPowHr developer's post](https://www.reddit.com/r/IndoorCycling/comments/1qd9zjm/i_built_a_free_apple_watch_app_to_sync_indoor/). This is an independent Swift implementation with its own name and interface.
 
 ## What it does
@@ -76,3 +78,5 @@ Simulator tests use ad-hoc signing to preserve the HealthKit entitlement; disabl
 For a quick demo, use **Try demo ride** on the home screen or launch the installed simulator app with `--demo`.
 
 See [verified results](docs/VERIFICATION.md), [hardware validation](docs/HARDWARE-VALIDATION.md) for the remaining checks before relying on the app for real workouts, and [implementation notes](docs/IMPLEMENTATION.md) for protocols, data ownership, and recovery boundaries.
+
+The app icon and project favicon use [Phosphor's bicycle icon](Brand/README.md), with its MIT license included. Regenerate the complete icon set with `swift tools/generate-icon.swift`.

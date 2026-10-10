@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		1923DF5EF431D470393F21C2 /* SummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95FFA7CA7623D8564EBC7525 /* SummaryView.swift */; };
+		233FD797C085284CD86C373C /* Phosphor-LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = 3F0D13C11D54E16351F75337 /* Phosphor-LICENSE.txt */; };
 		304C6FCFBF5C861B5685E264 /* HealthPersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09256E4AB951C7A15D6C4490 /* HealthPersistenceTests.swift */; };
 		6B35B85E7108CAE8E767C61A /* BluetoothManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 294B109D21DAAAABD2B0866B /* BluetoothManager.swift */; };
 		6CDCC252EEA628AC7A200E79 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5416106C65272D4CB783C12A /* RootView.swift */; };
@@ -45,6 +46,7 @@
 		294B109D21DAAAABD2B0866B /* BluetoothManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothManager.swift; sourceTree = "<group>"; };
 		30848A4C846E5E338D051C4F /* BikeTrackUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BikeTrackUITests.swift; sourceTree = "<group>"; };
 		3E910FF1EDB661FD33B1950B /* WorkoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutView.swift; sourceTree = "<group>"; };
+		3F0D13C11D54E16351F75337 /* Phosphor-LICENSE.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Phosphor-LICENSE.txt"; sourceTree = "<group>"; };
 		3FCD2E296DCEBE854EB23A0C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		5416106C65272D4CB783C12A /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		5D0B0F73C3F4F5845D617268 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
@@ -72,6 +74,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		2B3AE45E100FBB36E0E9D26A /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				3F0D13C11D54E16351F75337 /* Phosphor-LICENSE.txt */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
 		4915CCD3E0E305A3F9509464 /* Views */ = {
 			isa = PBXGroup;
 			children = (
@@ -109,6 +119,7 @@
 				BB2AAEEAEA196FA0837755D3 /* BikeTrackApp.swift */,
 				3FCD2E296DCEBE854EB23A0C /* Info.plist */,
 				B559D05AB23051E3C11AD623 /* PrivacyInfo.xcprivacy */,
+				2B3AE45E100FBB36E0E9D26A /* Resources */,
 				EE6BD8A39633FBB2A97C253C /* Services */,
 				4915CCD3E0E305A3F9509464 /* Views */,
 			);
@@ -262,6 +273,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6D8F747D61892700F357537A /* Assets.xcassets in Resources */,
+				233FD797C085284CD86C373C /* Phosphor-LICENSE.txt in Resources */,
 				90C31D1BE366725989514FCF /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
