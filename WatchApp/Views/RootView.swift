@@ -3,10 +3,16 @@ import RideCore
 
 enum Palette {
     static let lime = Color(red: 0.77, green: 0.98, blue: 0.32)
-    static let coral = Color(red: 1, green: 0.40, blue: 0.40)
-    static let blue = Color(red: 0.40, green: 0.78, blue: 1)
-    static let panel = Color(white: 0.11)
-    static let muted = Color(white: 0.62)
+    static let coral = Color(red: 1, green: 0.66, blue: 0.51)
+    static let blue = Color(red: 0.65, green: 0.75, blue: 1)
+    static let panel = Color(red: 0.09, green: 0.10, blue: 0.12)
+    static let muted = Color(red: 0.66, green: 0.69, blue: 0.73)
+
+    static func zone(_ id: Int) -> Color {
+        [blue, Color(red: 0.99, green: 0.88, blue: 0.65), Color(red: 1, green: 0.81, blue: 0.50),
+         coral, Color(red: 1, green: 0.46, blue: 0.28), Color(red: 0.96, green: 0.35, blue: 0.39),
+         Color(red: 0.84, green: 0.55, blue: 0.88), Color(red: 0.70, green: 0.61, blue: 1)][min(7, max(0, id))]
+    }
 }
 
 struct RootView: View {
@@ -21,7 +27,7 @@ struct RootView: View {
             case .ending, .saving: ProgressView("Saving workout…")
             case .saveFailed: SaveFailureView()
             case .summary:
-                if let summary = workout.summary { SummaryView(record: summary, dismiss: workout.reset) }
+                if let summary = workout.summary { NavigationStack { SummaryView(record: summary, dismiss: workout.reset) } }
             }
         }
         .background(Color.black)
@@ -114,6 +120,10 @@ struct HomeView: View {
                         .accessibilityLabel("Settings")
                         .accessibilityIdentifier("settings")
                 }
+                NavigationLink { ZoneSettingsView() } label: {
+                    Label("Training zones", systemImage: "chart.bar.xaxis")
+                        .font(.system(size: 13, weight: .medium))
+                }.accessibilityIdentifier("trainingZones")
                 Button("Try demo ride") { Task { await workout.start(activity: activity, demo: true) } }
                     .font(.caption2).foregroundStyle(Palette.muted).buttonStyle(.plain)
                     .disabled(!workout.canStart)

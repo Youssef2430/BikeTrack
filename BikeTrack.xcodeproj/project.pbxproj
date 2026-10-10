@@ -8,8 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		1923DF5EF431D470393F21C2 /* SummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95FFA7CA7623D8564EBC7525 /* SummaryView.swift */; };
+		1E1F422F80FB9D36E005EAFB /* TrainingSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DAD28A8C69FC6CF3C7AE0F8 /* TrainingSettings.swift */; };
 		233FD797C085284CD86C373C /* Phosphor-LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = 3F0D13C11D54E16351F75337 /* Phosphor-LICENSE.txt */; };
 		304C6FCFBF5C861B5685E264 /* HealthPersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09256E4AB951C7A15D6C4490 /* HealthPersistenceTests.swift */; };
+		4DA98ED0AF4FC7549D70986D /* AnalyticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A7B339F8DF1FFD865BE7E03 /* AnalyticsView.swift */; };
 		6B35B85E7108CAE8E767C61A /* BluetoothManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 294B109D21DAAAABD2B0866B /* BluetoothManager.swift */; };
 		6CDCC252EEA628AC7A200E79 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5416106C65272D4CB783C12A /* RootView.swift */; };
 		6D8F747D61892700F357537A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7144CA8F8849116705C2A275 /* Assets.xcassets */; };
@@ -48,6 +50,8 @@
 		3E910FF1EDB661FD33B1950B /* WorkoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutView.swift; sourceTree = "<group>"; };
 		3F0D13C11D54E16351F75337 /* Phosphor-LICENSE.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Phosphor-LICENSE.txt"; sourceTree = "<group>"; };
 		3FCD2E296DCEBE854EB23A0C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		4A7B339F8DF1FFD865BE7E03 /* AnalyticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsView.swift; sourceTree = "<group>"; };
+		4DAD28A8C69FC6CF3C7AE0F8 /* TrainingSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainingSettings.swift; sourceTree = "<group>"; };
 		5416106C65272D4CB783C12A /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		5D0B0F73C3F4F5845D617268 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		5FC24B0C49DDAF46A97C9DBB /* BikeTrackTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BikeTrackTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -85,6 +89,7 @@
 		4915CCD3E0E305A3F9509464 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				4A7B339F8DF1FFD865BE7E03 /* AnalyticsView.swift */,
 				5416106C65272D4CB783C12A /* RootView.swift */,
 				5D0B0F73C3F4F5845D617268 /* SettingsView.swift */,
 				95FFA7CA7623D8564EBC7525 /* SummaryView.swift */,
@@ -139,6 +144,7 @@
 			children = (
 				294B109D21DAAAABD2B0866B /* BluetoothManager.swift */,
 				0F6066C5291D0E409EC7B854 /* LocalStore.swift */,
+				4DAD28A8C69FC6CF3C7AE0F8 /* TrainingSettings.swift */,
 				6AEDB7BFD544B88E6826317B /* WorkoutController.swift */,
 			);
 			path = Services;
@@ -301,12 +307,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4DA98ED0AF4FC7549D70986D /* AnalyticsView.swift in Sources */,
 				FB5A50689AFD12E23D9C2EEC /* BikeTrackApp.swift in Sources */,
 				6B35B85E7108CAE8E767C61A /* BluetoothManager.swift in Sources */,
 				C963E6AB199AFBA88F7D182F /* LocalStore.swift in Sources */,
 				6CDCC252EEA628AC7A200E79 /* RootView.swift in Sources */,
 				71369E233602F1AA134A6CC7 /* SettingsView.swift in Sources */,
 				1923DF5EF431D470393F21C2 /* SummaryView.swift in Sources */,
+				1E1F422F80FB9D36E005EAFB /* TrainingSettings.swift in Sources */,
 				7E75990BA7BA1F8FE2D163A3 /* WorkoutController.swift in Sources */,
 				933898E37F34709CDA3B6F7A /* WorkoutView.swift in Sources */,
 			);

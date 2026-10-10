@@ -2,16 +2,18 @@
 
 ## Structure
 
-- `Sources/RideCore`: platform-independent packet parsing, revolution calculations, source selection, distance accounting, and record formatting. Tested on macOS with Swift Testing.
+- `Sources/RideCore`: platform-independent packet parsing, revolution calculations, source selection, distance accounting, zone classification, time-weighted analytics, and record formatting. Tested on macOS with Swift Testing.
 - `WatchApp/Services/BluetoothManager.swift`: main-queue CoreBluetooth discovery, subscriptions, reconnection with capped backoff, and packet routing.
 - `WatchApp/Services/WorkoutController.swift`: HealthKit lifecycle, sample buffering, durable checkpoints, retry, recovery, and demo isolation.
 - `WatchApp/Services/LocalStore.swift`: atomic local JSON storage and opt-in diagnostics.
-- `WatchApp/Views`: native SwiftUI home, equipment, workout pages, summary, history, and settings.
+- `WatchApp/Views`: native SwiftUI home, equipment, workout pages, summary, history, and settings, with Swift Charts for heart-rate and power trends.
 - `WatchTests`: Watch-hosted HealthKit sample archive, unit compatibility, and equipment-to-workout persistence tests.
 - `UITests`: actual Watch simulator interaction tests.
 - `project.yml`: reproducible XcodeGen project definition. The `.xcodeproj` is also included.
 
 There are no external runtime packages. `RideCore` is a local Swift package.
+
+Training analytics are captured from accepted equipment power and HealthKit heart-rate observations, with independent freshness limits. The main-run-loop timer uses common modes so elapsed time and recording updates continue during scrolling. Each checkpoint stores the original threshold profile, bounded display samples, and independently accumulated zone totals. See [TRAINING-ZONES.md](TRAINING-ZONES.md) for exact boundaries and accounting rules.
 
 ## Bluetooth
 

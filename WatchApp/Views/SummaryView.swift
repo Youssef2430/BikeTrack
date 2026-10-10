@@ -18,13 +18,19 @@ struct SummaryView: View {
                     Text(record.isDemo ? "Nothing was written to Health." : record.savedToHealth ? "Ready in Apple Fitness & Health." : "This workout is not confirmed in Health.")
                         .font(.caption2).foregroundStyle(Palette.muted)
                 }
-                Text(record.activity.title).font(.headline)
-                DetailRow(label: "Time", value: MetricFormat.elapsed(record.duration))
-                if record.distanceMethod != .unavailable {
-                    DetailRow(label: "Distance", value: "\(MetricFormat.distance(record.distanceMeters, imperial: imperial)) \(imperial ? "mi" : "km")")
+                HStack(alignment: .top) {
+                    compactStat("Duration", value: MetricFormat.elapsed(record.duration), unit: "active time", tint: .white)
+                    Spacer(minLength: 5)
+                    compactStat("Distance", value: record.distanceMethod == .unavailable ? "—" : MetricFormat.distance(record.distanceMeters, imperial: imperial), unit: imperial ? "mi" : "km", tint: Palette.lime)
                 }
-                if let power = record.averagePower { DetailRow(label: "Average power", value: String(format: "%.0f W", power)) }
-                if let hr = record.averageHeartRate { DetailRow(label: "Average heart rate", value: String(format: "%.0f bpm", hr)) }
+                if let analytics = record.analytics {
+                    insightLink(analytics, metric: .heartRate)
+                    if record.activity == .cycling { insightLink(analytics, metric: .power) }
+                } else {
+                    if let hr = record.averageHeartRate { DetailRow(label: "Average heart rate", value: String(format: "%.0f bpm", hr)) }
+                    if let power = record.averagePower { DetailRow(label: "Average power", value: String(format: "%.0f W", power)) }
+                    Text("Charts are available for workouts recorded with the new version.").font(.caption2).foregroundStyle(Palette.muted)
+                }
                 if let energy = record.energyKcal { DetailRow(label: "Active energy", value: String(format: "%.0f kcal", energy)) }
                 Text(record.distanceMethod.label).font(.caption2).foregroundStyle(Palette.muted)
                 if let dismiss {
@@ -33,6 +39,26 @@ struct SummaryView: View {
                 }
             }.padding(.horizontal, 5).padding(.vertical, 8)
         }
+    }
+
+    private func insightLink(_ analytics: WorkoutAnalytics, metric: ZoneMetric) -> some View {
+        NavigationLink {
+            WorkoutInsightsView(analytics: analytics, metric: metric, duration: record.duration)
+        } label: {
+            VStack(alignment: .leading, spacing: 7) {
+                HStack {
+                    Label(metric.title, systemImage: metric.symbol).font(.system(size: 12, weight: .medium)).foregroundStyle(metric.tint)
+                    Spacer(minLength: 2)
+                    Image(systemName: "chevron.right").font(.system(size: 9)).foregroundStyle(Palette.muted)
+                }
+                HStack(alignment: .firstTextBaseline, spacing: 3) {
+                    Text(formatted(analytics.timeline(for: metric).average)).font(.system(size: 26, weight: .semibold, design: .rounded))
+                    Text("\(metric.unit) avg").font(.system(size: 10)).foregroundStyle(Palette.muted)
+                }
+                TrendChart(timeline: analytics.timeline(for: metric), metric: metric, compact: true)
+                Text("Explore zones").font(.system(size: 10)).foregroundStyle(Palette.muted)
+            }.metricCard()
+        }.buttonStyle(.plain).accessibilityIdentifier("\(metric.rawValue)SummaryChart")
     }
 }
 

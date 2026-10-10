@@ -11,6 +11,8 @@ A lightweight, standalone Apple Watch app for tracking indoor bike sessions, bas
 - Combines equipment metrics with the Watch's heart rate and active energy.
 - Records indoor cycling, running, and walking workouts to HealthKit for Apple Fitness and Health.
 - Shows power, cadence, speed, distance, elapsed time, heart rate, and energy when available.
+- Shows live heart-rate and cycling power zones, with separate trend charts and time-in-zone breakdowns.
+- Saves chart data and each workout's maximum-heart-rate/FTP settings alongside local history.
 - Supports pause/resume, automatic reconnection, save retries, and active-workout recovery.
 - Retains the last 100 saved workout summaries locally.
 - Offers metric/imperial units and optional calibrated wheel-distance estimation.
@@ -18,6 +20,15 @@ A lightweight, standalone Apple Watch app for tracking indoor bike sessions, bas
 - Includes a labeled demo mode that never writes to Health or workout history.
 
 No accounts, subscriptions, analytics SDKs, or app-operated server. Export to Strava is through a separate Health-compatible exporter such as HealthFit; direct Strava integration is not included.
+
+<p>
+  <img src="docs/screenshots/live-zones-small.png" width="160" alt="BikeTrack live heart-rate and power zones on a 40 mm Watch simulator">
+  <img src="docs/screenshots/heart-rate-trend-small.png" width="160" alt="Live heart-rate trend in demo mode">
+  <img src="docs/screenshots/power-trend-small.png" width="160" alt="Live cycling power trend in demo mode">
+  <img src="docs/screenshots/power-distribution-large.png" width="200" alt="Time spent in cycling power zones">
+</p>
+
+Actual watchOS simulator screenshots. Workout values shown here are simulated demo data.
 
 ## Open and run
 
@@ -31,8 +42,10 @@ For your Watch:
 2. Pair the Watch with Xcode and enable Developer Mode when prompted.
 3. Build and run on the Watch. Accept Bluetooth and Health permissions.
 4. Wake the bike by pedaling, choose **Connect equipment**, and select it. Close other connected fitness apps if the bike allows only one client.
-5. Choose **Indoor ride**, tap **Start ride**, and grant all requested Health permissions to record every supported metric.
-6. Swipe right from the metrics page for pause/resume and end/save. Swipe left for connection details.
+5. Open **Training zones** to enter your measured maximum heart rate and cycling FTP. Each value is optional; charts still record without it, but its zones remain unset.
+6. Choose **Indoor ride**, tap **Start ride**, and grant all requested Health permissions to record every supported metric.
+7. Swipe right from the metrics page for pause/resume and end/save. Swipe left for heart-rate zones, power zones (cycling), and connection details. Scroll a zone page for its time distribution.
+8. After saving, tap either chart to explore the workout's averages, peaks, and zone breakdowns. The same analysis is available from History.
 
 The simulator can exercise the UI and persistence but cannot validate real Bluetooth accessories, optical heart rate, on-wrist background behavior, or actual Fitness synchronization.
 
@@ -76,6 +89,8 @@ xcodebuild -project BikeTrack.xcodeproj -scheme BikeTrack \
 Simulator tests use ad-hoc signing to preserve the HealthKit entitlement; disabling signing permits UI demos but causes HealthKit authorization to fail. Health lifecycle and generated equipment tests write only to the simulator's isolated Health store and are disabled on physical Watches. The equipment integration test skips if permissions have not been granted. Permission-sheet automation targets watchOS 27.
 
 For a quick demo, use **Try demo ride** on the home screen or launch the installed simulator app with `--demo`.
+
+The interface takes inspiration from Bevel's restrained cards and warm zone colors while keeping BikeTrack's own identity. See [zones and chart methodology](docs/TRAINING-ZONES.md) for exact boundaries, missing-data handling, and source references.
 
 See [verified results](docs/VERIFICATION.md), [hardware validation](docs/HARDWARE-VALIDATION.md) for the remaining checks before relying on the app for real workouts, and [implementation notes](docs/IMPLEMENTATION.md) for protocols, data ownership, and recovery boundaries.
 

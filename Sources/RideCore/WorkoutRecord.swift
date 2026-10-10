@@ -23,16 +23,19 @@ public struct WorkoutRecord: Codable, Identifiable, Equatable, Sendable {
     public var energyKcal: Double?
     public var savedToHealth: Bool
     public var isDemo: Bool
+    public var analytics: WorkoutAnalytics?
 
     public init(id: UUID = UUID(), startedAt: Date, activity: ActivityKind,
                 duration: TimeInterval, distanceMeters: Double, distanceMethod: DistanceMethod,
                 averagePower: Double? = nil, averageHeartRate: Double? = nil,
-                energyKcal: Double? = nil, savedToHealth: Bool = false, isDemo: Bool = false) {
+                energyKcal: Double? = nil, savedToHealth: Bool = false, isDemo: Bool = false,
+                analytics: WorkoutAnalytics? = nil) {
         self.id = id; self.startedAt = startedAt; self.activity = activity
         self.duration = duration; self.distanceMeters = distanceMeters
         self.distanceMethod = distanceMethod; self.averagePower = averagePower
         self.averageHeartRate = averageHeartRate; self.energyKcal = energyKcal
         self.savedToHealth = savedToHealth; self.isDemo = isDemo
+        self.analytics = analytics
     }
 }
 

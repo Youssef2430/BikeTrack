@@ -9,7 +9,9 @@ struct WorkoutView: View {
         TabView(selection: $page) {
             WorkoutControls().tag(0)
             LiveMetricsView().tag(1)
-            WorkoutDetailsView().tag(2)
+            LiveZoneView(metric: .heartRate).tag(2)
+            if workout.activity == .cycling { LiveZoneView(metric: .power).tag(3) }
+            WorkoutDetailsView().tag(4)
         }
         .tabViewStyle(.page(indexDisplayMode: .automatic))
         .accessibilityIdentifier("workoutPages")
@@ -22,78 +24,72 @@ struct LiveMetricsView: View {
     @AppStorage("imperial") private var imperial = false
 
     var body: some View {
-        TimelineView(.periodic(from: .now, by: 1)) { timeline in
-            let now = timeline.date
-            VStack(spacing: 5) {
-                HStack(spacing: 4) {
-                    Circle().fill(workout.phase == .paused ? .orange : Palette.lime).frame(width: 5, height: 5)
-                    Text(workout.isDemo ? "DEMO" : workout.phase == .paused ? "PAUSED" : "RECORDING")
-                        .font(.system(size: 9, weight: .bold, design: .rounded)).tracking(1.3)
-                    Spacer()
-                    if !workout.isDemo && !bluetooth.connected {
-                        Image(systemName: "antenna.radiowaves.left.and.right.slash").foregroundStyle(.orange)
-                            .font(.system(size: 10)).accessibilityLabel("Equipment disconnected")
+        TimelineView(.periodic(from: .now, by: 1)) { context in
+            ScrollView {
+                VStack(spacing: 7) {
+                    HStack(alignment: .firstTextBaseline) {
+                        Text(MetricFormat.elapsed(workout.elapsed))
+                            .font(.system(size: 21, weight: .medium, design: .rounded)).monospacedDigit()
+                        Spacer(minLength: 2)
+                        Text(workout.isDemo ? "DEMO" : workout.phase == .paused ? "PAUSED" : "RECORDING")
+                            .font(.system(size: 8, weight: .bold)).tracking(0.7)
+                            .foregroundStyle(workout.phase == .paused ? Palette.coral : Palette.lime)
                     }
-                }
-                Text(MetricFormat.elapsed(workout.elapsed))
-                    .font(.system(size: 25, weight: .medium, design: .rounded)).monospacedDigit()
-                    .foregroundStyle(Palette.lime).frame(maxWidth: .infinity, alignment: .leading)
-                    .accessibilityLabel("Elapsed time \(MetricFormat.elapsed(workout.elapsed))")
-                HStack(alignment: .firstTextBaseline, spacing: 4) {
-                    Text(primary(at: now))
-                        .font(.system(size: 49, weight: .semibold, design: .rounded)).monospacedDigit()
-                        .minimumScaleFactor(0.6).lineLimit(1)
-                    Text(workout.activity == .cycling ? "W" : imperial ? "MPH" : "KM/H")
-                        .font(.system(size: 12, weight: .medium)).foregroundStyle(Palette.muted)
-                    Spacer(minLength: 0)
-                }
-                .accessibilityElement(children: .ignore)
-                .accessibilityLabel(workout.activity == .cycling ? "Power" : "Speed")
-                .accessibilityValue(primary(at: now))
-                HStack {
-                    smallMetric(symbol: "heart.fill", value: format(workout.heartRate), unit: "BPM", color: Palette.coral)
-                    Spacer()
                     if workout.activity == .cycling {
-                        smallMetric(symbol: "arrow.trianglehead.2.clockwise.rotate.90", value: format(workout.engine.cadence?.fresh(at: now)), unit: "RPM", color: Palette.blue)
+                        HStack(spacing: 6) {
+                            liveCard(.power, at: context.date)
+                            liveCard(.heartRate, at: context.date)
+                        }
                     } else {
-                        smallMetric(symbol: "flame.fill", value: format(workout.energyKcal), unit: "KCAL", color: .orange)
+                        HStack(alignment: .firstTextBaseline) {
+                            Text(workout.phase == .paused ? "—" : workout.engine.speed?.fresh(at: context.date).map {
+                                String(format: "%.1f", $0 / (imperial ? 1.609344 : 1))
+                            } ?? "—").font(.system(size: 35, weight: .semibold, design: .rounded))
+                            Text(imperial ? "mph" : "km/h").font(.caption2).foregroundStyle(Palette.muted)
+                            Spacer()
+                        }.metricCard()
                     }
-                }
-                Rectangle().fill(Color.white.opacity(0.15)).frame(height: 1)
-                HStack(alignment: .firstTextBaseline) {
-                    Text(workout.engine.distanceMethod == .unavailable ? "—" : MetricFormat.distance(workout.engine.distanceMeters, imperial: imperial))
-                        .font(.system(size: 20, weight: .medium, design: .rounded)).monospacedDigit()
-                    Text(imperial ? "MI" : "KM").font(.system(size: 10)).foregroundStyle(Palette.muted)
-                    Spacer()
-                    Image(systemName: workout.activity.symbol)
-                        .resizable().scaledToFit().frame(width: 26, height: 26)
-                        .foregroundStyle(Palette.lime)
-                        .padding(.trailing, 8)
-                }
+                    if workout.activity != .cycling { liveCard(.heartRate, at: context.date) }
+                    HStack(spacing: 4) {
+                        Image(systemName: workout.activity.symbol).foregroundStyle(Palette.lime)
+                        Text(workout.engine.distanceMethod == .unavailable ? "—" : MetricFormat.distance(workout.engine.distanceMeters, imperial: imperial))
+                        Text(imperial ? "mi" : "km").foregroundStyle(Palette.muted)
+                        Spacer(minLength: 4)
+                        if workout.activity == .cycling {
+                            Text(workout.phase == .paused ? "—" : formatted(workout.engine.cadence?.fresh(at: context.date)))
+                            Text("rpm").foregroundStyle(Palette.muted)
+                        }
+                    }.font(.system(size: 11, weight: .medium)).monospacedDigit().padding(.horizontal, 4)
+                    if !workout.isDemo && !bluetooth.connected {
+                        Label("Equipment disconnected", systemImage: "antenna.radiowaves.left.and.right.slash")
+                            .font(.system(size: 10)).foregroundStyle(Palette.coral)
+                    }
+                }.padding(.horizontal, 3).padding(.bottom, 12)
             }
-            .padding(.horizontal, 6)
-            .opacity(workout.phase == .paused ? 0.7 : 1)
         }
     }
 
-    private func primary(at date: Date) -> String {
-        if workout.phase == .paused { return "—" }
-        if workout.activity == .cycling { return format(workout.engine.power?.fresh(at: date)) }
-        guard let kph = workout.engine.speed?.fresh(at: date) else { return "—" }
-        return String(format: "%.1f", kph / (imperial ? 1.609344 : 1))
-    }
-
-    private func format(_ value: Double?) -> String { value.map { String(format: "%.0f", $0) } ?? "—" }
-
-    private func smallMetric(symbol: String, value: String, unit: String, color: Color) -> some View {
-        VStack(alignment: .leading, spacing: 2) {
-            HStack(spacing: 4) {
-                Image(systemName: symbol).font(.system(size: 10)).foregroundStyle(color)
-                Text(unit).font(.system(size: 9, weight: .medium)).foregroundStyle(Palette.muted)
-            }
-            Text(value).font(.system(size: 25, weight: .semibold, design: .rounded)).monospacedDigit()
+    private func liveCard(_ metric: ZoneMetric, at date: Date) -> some View {
+        let value = workout.liveValue(for: metric, at: date)
+        let profile = workout.analytics.profile
+        let zone = profile.zone(for: value, metric: metric)
+        return VStack(alignment: .leading, spacing: 5) {
+            Label(metric == .heartRate ? "Heart" : "Power", systemImage: metric.symbol)
+                .font(.system(size: 10, weight: .medium)).foregroundStyle(metric.tint)
+                .frame(height: 12)
+            HStack(alignment: .firstTextBaseline, spacing: 2) {
+                Text(formatted(value)).font(.system(size: 30, weight: .semibold, design: .rounded)).monospacedDigit()
+                    .minimumScaleFactor(0.65).lineLimit(1)
+                Text(metric.unit).font(.system(size: 8)).foregroundStyle(Palette.muted)
+            }.frame(maxWidth: .infinity, alignment: .leading).frame(height: 36)
+            Text(zone?.label ?? (profile.baseline(for: metric) == nil ? "Set up" : "—"))
+                .font(.system(size: 11, weight: .semibold)).foregroundStyle(zone.map { Palette.zone($0.id) } ?? Palette.muted)
+                .accessibilityIdentifier("\(metric.rawValue)ZoneBadge")
+            ZoneStrip(profile: profile, metric: metric, selected: zone?.id)
         }
-        .accessibilityElement(children: .combine)
+        .padding(8).frame(maxWidth: .infinity, alignment: .leading)
+        .background(Palette.panel, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous).strokeBorder(.white.opacity(0.06)))
     }
 }
 

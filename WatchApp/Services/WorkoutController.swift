@@ -53,6 +53,8 @@ final class WorkoutController: NSObject, ObservableObject {
     @Published private(set) var recoveryRecord: WorkoutRecord?
     @Published var errorMessage: String?
     @Published private(set) var healthNotice: String?
+    @Published private(set) var analytics = WorkoutAnalytics()
+    private var analyticsRecorder = AnalyticsRecorder(profile: TrainingProfile())
     let bluetooth = BluetoothManager()
 
     private let health = HKHealthStore()
@@ -83,7 +85,12 @@ final class WorkoutController: NSObject, ObservableObject {
     override init() {
         super.init()
         bluetooth.onPacket = { [weak self] packet, source, date in self?.receive(packet, source: source, at: date) }
-        bluetooth.onDisconnect = { [weak self] in self?.engine.disconnect() }
+        bluetooth.onDisconnect = { [weak self] in
+            guard let self else { return }
+            self.engine.disconnect()
+            self.analyticsRecorder.disconnectPower(at: self.activeElapsed(at: Date()))
+            self.analytics = self.analyticsRecorder.snapshot
+        }
         do {
             if let data = try LocalStore.shared.read("active-workout.json") {
                 let checkpoint = try JSONDecoder().decode(WorkoutCheckpoint.self, from: data)
@@ -101,6 +108,9 @@ final class WorkoutController: NSObject, ObservableObject {
         isDemo = demo
         errorMessage = nil; healthNotice = nil
         heartRate = nil; energyKcal = nil; summary = nil
+        latestHeartRateDate = nil
+        analyticsRecorder = AnalyticsRecorder(profile: demo ? TrainingSettings.demoProfile : TrainingSettings.profile)
+        analytics = analyticsRecorder.snapshot
         elapsed = 0; demoElapsed = 0; demoTick = 0; demoCounter = 0
         pending.removeAll(); lastSampleDates.removeAll()
         collectionEnded = false; finishing = false; endingDate = nil; recovered = false
@@ -175,6 +185,7 @@ final class WorkoutController: NSObject, ObservableObject {
     func pauseOrResume() {
         guard phase == .running || phase == .paused else { return }
         let resume = phase == .paused
+        if !resume { suspendAnalytics(at: Date()) }
         if isDemo {
             if !resume { demoElapsed = elapsed }
             segmentStart = Date()
@@ -192,6 +203,7 @@ final class WorkoutController: NSObject, ObservableObject {
     func endAndSave() {
         guard phase == .running || phase == .paused else { return }
         endingDate = Date()
+        suspendAnalytics(at: endingDate!)
         if isDemo {
             if phase == .running { elapsed = demoElapsed + Date().timeIntervalSince(segmentStart) }
             engine.setActive(false)
@@ -284,6 +296,8 @@ final class WorkoutController: NSObject, ObservableObject {
         session = nil; builder = nil
         pending.removeAll(); lastSampleDates.removeAll()
         engine = MetricsEngine()
+        analyticsRecorder = AnalyticsRecorder(profile: TrainingProfile())
+        analytics = analyticsRecorder.snapshot
         summary = nil; errorMessage = nil; heartRate = nil; energyKcal = nil
         elapsed = 0; isDemo = false; phase = .idle
     }
@@ -337,6 +351,9 @@ final class WorkoutController: NSObject, ObservableObject {
                          restoringMethod: restoredRecord?.distanceMethod ?? .unavailable)
             recoveryRecord = nil
             isDemo = false
+            analyticsRecorder = AnalyticsRecorder(restoring: restoredRecord?.analytics ?? WorkoutAnalytics())
+            analytics = analyticsRecorder.snapshot
+            elapsed = builder?.elapsedTime(at: Date()) ?? restoredRecord?.duration ?? 0
             switch session.state {
             case .running: phase = .running
             case .paused: phase = .paused; engine.setActive(false)
@@ -356,9 +373,11 @@ final class WorkoutController: NSObject, ObservableObject {
 
     private func startTimer() {
         timer?.invalidate()
-        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
+        let timer = Timer(timeInterval: 1, repeats: true) { [weak self] _ in
             Task { @MainActor in self?.tick() }
         }
+        RunLoop.main.add(timer, forMode: .common)
+        self.timer = timer
     }
 
     private func tick() {
@@ -370,14 +389,20 @@ final class WorkoutController: NSObject, ObservableObject {
             demoCounter += speed / 3.6
             let packet = BikePacket(speedKPH: speed,
                                     cadenceRPM: activity == .cycling ? 84 + sin(Double(demoTick) / 4) * 5 : nil,
-                                    powerWatts: activity == .cycling ? 180 + sin(Double(demoTick) / 7) * 30 : nil,
+                                    powerWatts: activity == .cycling ? 190 + sin(Double(demoTick) / 7) * 65 : nil,
                                     distanceMeters: demoCounter)
             receive(packet, source: activity == .cycling ? .indoorBike : .treadmill, at: now)
-            heartRate = 136 + sin(Double(demoTick) / 9) * 8
+            heartRate = 142 + sin(Double(demoTick) / 9) * 15
+            latestHeartRateDate = now
+            analyticsRecorder.observe(heartRate!, metric: .heartRate, at: elapsed)
             energyKcal = elapsed / 10
         } else if let builder {
             elapsed = builder.elapsedTime(at: now)
             if let date = latestHeartRateDate, now.timeIntervalSince(date) > 20 { heartRate = nil }
+        }
+        if phase == .running, engine.active { analyticsRecorder.advance(to: elapsed) }
+        analytics = analyticsRecorder.snapshot
+        if !isDemo, builder != nil {
             if now.timeIntervalSince(lastCheckpoint) >= 5, phase == .running || phase == .paused {
                 checkpoint()
                 startFlush()
@@ -389,7 +414,11 @@ final class WorkoutController: NSObject, ObservableObject {
         guard phase == .running || phase == .paused else { return }
         guard (activity == .cycling && source != .treadmill) || (activity != .cycling && source == .treadmill) else { return }
         let update = engine.ingest(packet, source: source, at: date)
-        guard phase == .running, engine.active, !isDemo else { return }
+        guard phase == .running, engine.active else { return }
+        if let power = update.power, activity == .cycling {
+            analyticsRecorder.observe(power, metric: .power, at: activeElapsed(at: date))
+        }
+        guard !isDemo else { return }
         if activity == .cycling {
             enqueue(.cyclingPower, unit: "W", value: update.power, at: date)
             enqueue(.cyclingCadence, unit: "count/min", value: update.cadence, at: date)
@@ -462,7 +491,29 @@ final class WorkoutController: NSObject, ObservableObject {
                       distanceMeters: engine.distanceMeters, distanceMethod: engine.distanceMethod,
                       averagePower: builder?.statistics(for: HKQuantityType(.cyclingPower))?.averageQuantity()?.doubleValue(for: .watt()),
                       averageHeartRate: builder?.statistics(for: HKQuantityType(.heartRate))?.averageQuantity()?.doubleValue(for: HKUnit.count().unitDivided(by: .minute())),
-                      energyKcal: energyKcal, isDemo: isDemo)
+                      energyKcal: energyKcal, isDemo: isDemo, analytics: analyticsRecorder.snapshot)
+    }
+
+    private func activeElapsed(at date: Date) -> TimeInterval {
+        if isDemo { return phase == .running ? demoElapsed + max(0, date.timeIntervalSince(segmentStart)) : elapsed }
+        return builder?.elapsedTime(at: date) ?? elapsed
+    }
+
+    private func suspendAnalytics(at date: Date) {
+        elapsed = activeElapsed(at: date)
+        analyticsRecorder.suspend(at: elapsed)
+        analytics = analyticsRecorder.snapshot
+    }
+
+    func liveValue(for metric: ZoneMetric, at date: Date) -> Double? {
+        guard phase == .running, engine.active else { return nil }
+        if metric == .power {
+            guard let reading = engine.power, reading.date >= segmentStart else { return nil }
+            return reading.fresh(at: date)
+        }
+        guard let latestHeartRateDate, latestHeartRateDate >= segmentStart,
+              (0...20).contains(date.timeIntervalSince(latestHeartRateDate)) else { return nil }
+        return heartRate
     }
 }
 
@@ -480,6 +531,7 @@ extension WorkoutController: HKWorkoutSessionDelegate, HKLiveWorkoutBuilderDeleg
                 }
             case .paused:
                 if self.phase == .running {
+                    self.suspendAnalytics(at: date)
                     self.engine.setActive(false)
                     self.phase = .paused
                 }
@@ -487,6 +539,7 @@ extension WorkoutController: HKWorkoutSessionDelegate, HKLiveWorkoutBuilderDeleg
                 if self.phase == .ending { await self.finish() }
             case .ended:
                 if self.phase == .running || self.phase == .paused {
+                    self.suspendAnalytics(at: date)
                     self.engine.setActive(false)
                     self.endingDate = date
                     await self.finish()
@@ -501,6 +554,7 @@ extension WorkoutController: HKWorkoutSessionDelegate, HKLiveWorkoutBuilderDeleg
             guard let self, self.session === workoutSession else { return }
             self.errorMessage = "Workout interrupted: \(error.localizedDescription)"
             if self.phase == .running || self.phase == .paused {
+                self.suspendAnalytics(at: Date())
                 self.engine.setActive(false)
                 self.endingDate = Date()
                 await self.finish()
@@ -516,8 +570,14 @@ extension WorkoutController: HKWorkoutSessionDelegate, HKLiveWorkoutBuilderDeleg
             for type in collectedTypes {
                 guard let quantity = type as? HKQuantityType, let stats = workoutBuilder.statistics(for: quantity) else { continue }
                 if quantity.identifier == HKQuantityTypeIdentifier.heartRate.rawValue {
-                    self.heartRate = stats.mostRecentQuantity()?.doubleValue(for: HKUnit.count().unitDivided(by: .minute()))
-                    self.latestHeartRateDate = stats.mostRecentQuantityDateInterval()?.end
+                    guard self.phase == .running, self.engine.active,
+                          let date = stats.mostRecentQuantityDateInterval()?.end,
+                          date >= self.segmentStart, date > (self.latestHeartRateDate ?? .distantPast),
+                          let value = stats.mostRecentQuantity()?.doubleValue(for: HKUnit.count().unitDivided(by: .minute())) else { continue }
+                    self.heartRate = value
+                    self.latestHeartRateDate = date
+                    let now = Date()
+                    self.analyticsRecorder.observe(value, metric: .heartRate, at: self.activeElapsed(at: now), age: max(0, now.timeIntervalSince(date)))
                 } else if quantity.identifier == HKQuantityTypeIdentifier.activeEnergyBurned.rawValue {
                     self.energyKcal = stats.sumQuantity()?.doubleValue(for: .kilocalorie())
                 }

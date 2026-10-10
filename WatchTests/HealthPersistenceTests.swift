@@ -14,6 +14,9 @@ final class HealthPersistenceTests: XCTestCase {
             throw XCTSkip("Run the simulator Health permission UI test first.")
         }
         let controller = WorkoutController.shared
+        let previousFTP = UserDefaults.standard.object(forKey: "ftp")
+        UserDefaults.standard.set(240.0, forKey: "ftp")
+        defer { UserDefaults.standard.set(previousFTP, forKey: "ftp") }
         await controller.start(activity: .cycling)
         XCTAssertEqual(controller.phase, .running)
 
@@ -41,6 +44,14 @@ final class HealthPersistenceTests: XCTestCase {
         XCTAssertTrue(summary.savedToHealth)
         XCTAssertEqual(summary.distanceMeters, 20, accuracy: 0.001)
         XCTAssertEqual(try XCTUnwrap(summary.averagePower), 200, accuracy: 0.001)
+        let analytics = try XCTUnwrap(summary.analytics)
+        XCTAssertEqual(analytics.profile.functionalThresholdPower, 240)
+        XCTAssertEqual(try XCTUnwrap(analytics.power.average), 200, accuracy: 0.001)
+        XCTAssertGreaterThan(analytics.power.zoneSeconds[3, default: 0], 1.5)
+        XCTAssertLessThanOrEqual(analytics.power.recordedSeconds, summary.duration + 0.1)
+        XCTAssertGreaterThan(Set(analytics.power.points.map(\.segment)).count, 1)
+        let savedLocally = try XCTUnwrap(LocalStore.shared.history.first { $0.id == summary.id })
+        XCTAssertEqual(savedLocally.analytics, analytics)
 
         let predicate = HKQuery.predicateForObjects(withMetadataKey: HKMetadataKeySyncIdentifier,
                                                    allowedValues: ["biketrack.workout.\(summary.id.uuidString)"])
@@ -58,6 +69,35 @@ final class HealthPersistenceTests: XCTestCase {
         XCTAssertEqual(try XCTUnwrap(cadence), 90, accuracy: 0.001)
         controller.reset()
         #endif
+    }
+
+    @MainActor
+    func testDemoRecordsBothChartsAndFreezesZonesWhilePaused() async throws {
+        let controller = WorkoutController.shared
+        await controller.start(activity: .cycling, demo: true)
+        try await Task.sleep(for: .seconds(3))
+        XCTAssertGreaterThan(controller.analytics.heartRate.points.count, 1)
+        XCTAssertGreaterThan(controller.analytics.power.points.count, 1)
+        XCTAssertNotNil(controller.liveValue(for: .heartRate, at: Date()))
+        XCTAssertNotNil(controller.liveValue(for: .power, at: Date()))
+        controller.pauseOrResume()
+        let paused = controller.analytics
+        try await Task.sleep(for: .seconds(2))
+        XCTAssertEqual(controller.analytics, paused)
+        XCTAssertNil(controller.liveValue(for: .heartRate, at: Date()))
+        XCTAssertNil(controller.liveValue(for: .power, at: Date()))
+        controller.pauseOrResume()
+        // A value from before the pause must not appear on resume.
+        XCTAssertNil(controller.liveValue(for: .heartRate, at: Date()))
+        XCTAssertNil(controller.liveValue(for: .power, at: Date()))
+        try await Task.sleep(for: .seconds(2))
+        controller.endAndSave()
+        let summary = try XCTUnwrap(controller.summary)
+        XCTAssertTrue(summary.isDemo)
+        XCTAssertFalse(summary.savedToHealth)
+        XCTAssertGreaterThan(try XCTUnwrap(summary.analytics).power.recordedSeconds, paused.power.recordedSeconds)
+        XCTAssertFalse(LocalStore.shared.history.contains { $0.id == summary.id })
+        controller.reset()
     }
 
     @MainActor
