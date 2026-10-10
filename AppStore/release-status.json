@@ -22,5 +22,7 @@
     "Chrome browser extension file upload reports Not allowed. Enable Allow access to file URLs or upload the prepared PNGs manually."
   ],
   "priceConfigured": "Free",
-  "availabilityConfigured": "All 175 countries or regions, available on app release"
+  "availabilityConfigured": "All 175 countries or regions, available on app release",
+  "contentRightsSaved": true,
+  "reviewNotesSaved": false
 }
