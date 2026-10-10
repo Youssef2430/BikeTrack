@@ -1,0 +1,70 @@
+name: BikeTrack
+options:
+  bundleIdPrefix: com.biketrack
+  deploymentTarget:
+    watchOS: '11.0'
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: '5.0'
+    SWIFT_STRICT_CONCURRENCY: targeted
+    MARKETING_VERSION: '1.0.0'
+    CURRENT_PROJECT_VERSION: '1'
+    CODE_SIGN_STYLE: Automatic
+packages:
+  RideCore:
+    path: .
+targets:
+  BikeTrack:
+    type: application
+    platform: watchOS
+    sources: [WatchApp]
+    dependencies:
+      - package: RideCore
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.biketrack.watchapp
+        TARGETED_DEVICE_FAMILY: '4'
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ENABLE_PREVIEWS: YES
+    info:
+      path: WatchApp/Info.plist
+      properties:
+        CFBundleDisplayName: BikeTrack
+        WKApplication: true
+        WKWatchOnly: true
+        WKBackgroundModes: [workout-processing]
+        NSBluetoothAlwaysUsageDescription: BikeTrack connects to your bike or treadmill to record speed, cadence, power, and distance.
+        NSHealthShareUsageDescription: BikeTrack reads your heart rate and workout energy so you can see them during your session.
+        NSHealthUpdateUsageDescription: BikeTrack saves your workouts, heart rate, energy, and equipment metrics to Apple Health and Fitness.
+    entitlements:
+      path: WatchApp/BikeTrack.entitlements
+      properties:
+        com.apple.developer.healthkit: true
+  BikeTrackUITests:
+    type: bundle.ui-testing
+    platform: watchOS
+    sources: [UITests]
+    dependencies:
+      - target: BikeTrack
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        PRODUCT_BUNDLE_IDENTIFIER: com.biketrack.uitests
+  BikeTrackTests:
+    type: bundle.unit-test
+    platform: watchOS
+    sources: [WatchTests]
+    dependencies:
+      - target: BikeTrack
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        PRODUCT_BUNDLE_IDENTIFIER: com.biketrack.tests
+schemes:
+  BikeTrack:
+    build:
+      targets:
+        BikeTrack: all
+    test:
+      targets: [BikeTrackTests, BikeTrackUITests]
