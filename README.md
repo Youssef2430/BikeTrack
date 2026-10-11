@@ -30,6 +30,10 @@ No accounts, subscriptions, analytics SDKs, or app-operated server. Export to St
 
 Actual watchOS simulator screenshots. Workout values shown here are simulated demo data.
 
+## Website
+
+The promotional website lives at [youssef2430.github.io/BikeTrack](https://youssef2430.github.io/BikeTrack/). Run `cd website && npm run dev`, then open http://127.0.0.1:4173. Source, build instructions, and the six original design concepts are in [website/](website/README.md).
+
 ## Open and run
 
 Open **BikeTrack.xcodeproj**, select the **BikeTrack** scheme, and select a Watch simulator or your paired Apple Watch. The generated Xcode project is included; XcodeGen is needed only when changing project configuration.

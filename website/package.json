@@ -1,0 +1,10 @@
+{
+  "name": "biketrack-website-directions",
+  "private": true,
+  "scripts": {
+    "build": "node scripts/build-production.mjs",
+    "dev": "node scripts/build-production.mjs && python3 -m http.server 4173 --bind 127.0.0.1 --directory ../docs",
+    "build:concepts": "node scripts/build.mjs",
+    "dev:concepts": "python3 -m http.server 4174 --bind 127.0.0.1 --directory dist"
+  }
+}

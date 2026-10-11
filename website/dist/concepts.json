@@ -1,0 +1,80 @@
+[
+  {
+    "id": "01-volt",
+    "name": "Volt",
+    "theme": "volt",
+    "note": "Electric. Athletic. Uncomplicated.",
+    "palette": [
+      "#c4fa52",
+      "#111410",
+      "#f4f5ec"
+    ],
+    "type": "Performance / bold type",
+    "description": "An electric lime identity with oversized athletic typography and a product-first layout."
+  },
+  {
+    "id": "02-forma",
+    "name": "Forma",
+    "theme": "forma",
+    "note": "A softer side of performance.",
+    "palette": [
+      "#6c3958",
+      "#eee0e7",
+      "#faf7f2"
+    ],
+    "type": "Refined / soft minimalism",
+    "description": "Sculptural product moments, warm whites, and expressive serif type. Calm, considered, and personal."
+  },
+  {
+    "id": "03-cadence",
+    "name": "Cadence",
+    "theme": "cadence",
+    "note": "Turn up. Tune in. Ride.",
+    "palette": [
+      "#f35b35",
+      "#25251f",
+      "#f2eedf"
+    ],
+    "type": "Editorial / sport poster",
+    "description": "A bold cycling poster brought to life with orange, compressed type, and an unapologetic editorial rhythm."
+  },
+  {
+    "id": "04-grove",
+    "name": "Grove",
+    "theme": "grove",
+    "note": "Make room for your daily ride.",
+    "palette": [
+      "#344e42",
+      "#e5e8dc",
+      "#f7f3e9"
+    ],
+    "type": "Organic / everyday ritual",
+    "description": "Sage, paper, and an easy reading pace make indoor movement feel like a daily ritual worth keeping."
+  },
+  {
+    "id": "05-metric",
+    "name": "Metric",
+    "theme": "metric",
+    "note": "A clearer picture of every effort.",
+    "palette": [
+      "#244fe6",
+      "#e8edff",
+      "#fafbfc"
+    ],
+    "type": "Swiss / product precision",
+    "description": "Cobalt accents, a modular grid, and an interactive data display put the product’s purpose in sharp focus."
+  },
+  {
+    "id": "06-nocturne",
+    "name": "Nocturne",
+    "theme": "nocturne",
+    "note": "Find your own frequency.",
+    "palette": [
+      "#9bccff",
+      "#101725",
+      "#f4b8ac"
+    ],
+    "type": "Immersive / quiet technology",
+    "description": "A midnight canvas, luminous orbital details, and a floating Watch make the experience feel focused and expansive."
+  }
+]
