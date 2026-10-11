@@ -1,0 +1,35 @@
+name: Checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: macos-15
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+      - name: Test core package
+        run: swift test
+      - name: Verify generated website
+        run: |
+          npm --prefix website run build
+          git diff --exit-code -- docs
+          test -z "$(git ls-files --others --exclude-standard docs)"
+      - name: Scan Git history for credentials
+        env:
+          HOMEBREW_NO_AUTO_UPDATE: '1'
+        run: |
+          command -v gitleaks >/dev/null || brew install gitleaks
+          gitleaks git . --log-opts=--all --redact=100 --no-banner

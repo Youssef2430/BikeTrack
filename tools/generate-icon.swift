@@ -1,10 +1,10 @@
 import AppKit
 
 // Run from the project root: swift tools/generate-icon.swift
-// Geometry is vendored from Phosphor Icons (MIT); see Brand/PHOSPHOR-LICENSE.txt.
+// Geometry is vendored from Phosphor Icons (MIT); see assets/brand/PHOSPHOR-LICENSE.txt.
 let root = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
 let catalog = root.appendingPathComponent("WatchApp/Assets.xcassets/AppIcon.appiconset")
-let source = try String(contentsOf: root.appendingPathComponent("Brand/bicycle-bold.svg"), encoding: .utf8)
+let source = try String(contentsOf: root.appendingPathComponent("assets/brand/bicycle-bold.svg"), encoding: .utf8)
 guard let start = source.range(of: "<path"), let end = source.range(of: "</svg>") else {
     fatalError("The vendored bicycle SVG is missing its path")
 }
@@ -61,11 +61,11 @@ struct Catalog: Decodable {
 let entries = try JSONDecoder().decode(Catalog.self, from: Data(contentsOf: catalog.appendingPathComponent("Contents.json")))
 let appSVG = artwork(rounded: false)
 let faviconSVG = artwork(rounded: true)
-try appSVG.write(to: root.appendingPathComponent("Brand/AppIcon.svg"), atomically: true, encoding: .utf8)
+try appSVG.write(to: root.appendingPathComponent("assets/brand/AppIcon.svg"), atomically: true, encoding: .utf8)
 try faviconSVG.write(to: root.appendingPathComponent("favicon.svg"), atomically: true, encoding: .utf8)
 let resources = root.appendingPathComponent("WatchApp/Resources")
 try FileManager.default.createDirectory(at: resources, withIntermediateDirectories: true)
-try Data(contentsOf: root.appendingPathComponent("Brand/PHOSPHOR-LICENSE.txt"))
+try Data(contentsOf: root.appendingPathComponent("assets/brand/PHOSPHOR-LICENSE.txt"))
     .write(to: resources.appendingPathComponent("Phosphor-LICENSE.txt"))
 
 for entry in entries.images {
@@ -76,7 +76,7 @@ for entry in entries.images {
 }
 
 // PNG favicon for tools that don't support SVG, and a multi-resolution ICO.
-try png(svg: faviconSVG, pixels: 256, opaque: false).write(to: root.appendingPathComponent("favicon.png"))
+try png(svg: faviconSVG, pixels: 256, opaque: false).write(to: root.appendingPathComponent("assets/brand/favicon.png"))
 let sizes = [16, 32, 48, 64, 128, 256]
 let frames = try sizes.map { try png(svg: faviconSVG, pixels: $0, opaque: false) }
 var ico = Data()
@@ -97,5 +97,5 @@ for (pixels, frame) in zip(sizes, frames) {
     offset += frame.count
 }
 for frame in frames { ico.append(frame) }
-try ico.write(to: root.appendingPathComponent("favicon.ico"))
+try ico.write(to: root.appendingPathComponent("assets/brand/favicon.ico"))
 print("Generated \(entries.images.count) Watch icons plus SVG, PNG, and ICO project favicons.")

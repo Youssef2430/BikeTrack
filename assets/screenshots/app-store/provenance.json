@@ -1,0 +1,15 @@
+{
+  "device": "Apple Watch Series 12 (46mm) simulator",
+  "runtime": "watchOS 27.0",
+  "dimensions": "416x496",
+  "format": "PNG, opaque",
+  "captured": "2026-10-10",
+  "values": "Simulated demo workout readings; app screenshots are unmodified.",
+  "files": [
+    "en-US/01-live-metrics.png",
+    "en-US/02-heart-rate.png",
+    "en-US/03-power.png",
+    "en-US/04-workout-analysis.png",
+    "en-US/05-home.png"
+  ]
+}

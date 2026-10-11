@@ -1,7 +1,38 @@
+# Local development and generated build artifacts
 .build/
+.swiftpm/
 build*/
-docs/screenshots/raw*/
 DerivedData/
 *.xcuserstate
 xcuserdata/
+*.xcarchive/
+*.xcresult/
+*.ipa
+*.dSYM/
+node_modules/
+website/dist/
+assets/screenshots/**/raw*/
 .DS_Store
+
+# Private release records and machine-specific configuration
+.local/
+.openai/
+.env
+.env.*
+!.env.example
+*.local.xcconfig
+ExportOptions.plist
+AppStore/metadata.json
+AppStore/release-status.json
+
+# Signing material and credentials
+*.p8
+*.p12
+*.pfx
+*.pem
+*.key
+*.cer
+*.mobileprovision
+*.provisionprofile
+*.keychain
+*.keychain-db

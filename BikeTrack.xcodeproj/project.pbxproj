@@ -10,7 +10,6 @@
 		1923DF5EF431D470393F21C2 /* SummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95FFA7CA7623D8564EBC7525 /* SummaryView.swift */; };
 		1E1F422F80FB9D36E005EAFB /* TrainingSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DAD28A8C69FC6CF3C7AE0F8 /* TrainingSettings.swift */; };
 		233FD797C085284CD86C373C /* Phosphor-LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = 3F0D13C11D54E16351F75337 /* Phosphor-LICENSE.txt */; };
-		304C6FCFBF5C861B5685E264 /* HealthPersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09256E4AB951C7A15D6C4490 /* HealthPersistenceTests.swift */; };
 		3D35728DFF98E4A9799C1FEA /* BikeTrack.app in Embed Dependencies */ = {isa = PBXBuildFile; fileRef = 979205327CB4821938DF1593 /* BikeTrack.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		4DA98ED0AF4FC7549D70986D /* AnalyticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A7B339F8DF1FFD865BE7E03 /* AnalyticsView.swift */; };
 		6B35B85E7108CAE8E767C61A /* BluetoothManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 294B109D21DAAAABD2B0866B /* BluetoothManager.swift */; };
@@ -22,7 +21,8 @@
 		90C31D1BE366725989514FCF /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = B559D05AB23051E3C11AD623 /* PrivacyInfo.xcprivacy */; };
 		933898E37F34709CDA3B6F7A /* WorkoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E910FF1EDB661FD33B1950B /* WorkoutView.swift */; };
 		A259A43EC3E4A3DD7D63F277 /* RideCore in Frameworks */ = {isa = PBXBuildFile; productRef = AF0E99BD9171FCE173D06EF0 /* RideCore */; };
-		AC7790BE6589ED20B1638DE9 /* BikeTrackUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30848A4C846E5E338D051C4F /* BikeTrackUITests.swift */; };
+		A5915EA342B4171DEE941AC7 /* HealthPersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1612FAE25CDE14831004EE6E /* HealthPersistenceTests.swift */; };
+		C0B184B6130328585E35BBE6 /* BikeTrackUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E038D9961CF9606ECEF1EBCC /* BikeTrackUITests.swift */; };
 		C963E6AB199AFBA88F7D182F /* LocalStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F6066C5291D0E409EC7B854 /* LocalStore.swift */; };
 		FB5A50689AFD12E23D9C2EEC /* BikeTrackApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB2AAEEAEA196FA0837755D3 /* BikeTrackApp.swift */; };
 /* End PBXBuildFile section */
@@ -66,10 +66,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		09256E4AB951C7A15D6C4490 /* HealthPersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthPersistenceTests.swift; sourceTree = "<group>"; };
 		0F6066C5291D0E409EC7B854 /* LocalStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalStore.swift; sourceTree = "<group>"; };
+		1612FAE25CDE14831004EE6E /* HealthPersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthPersistenceTests.swift; sourceTree = "<group>"; };
 		294B109D21DAAAABD2B0866B /* BluetoothManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothManager.swift; sourceTree = "<group>"; };
-		30848A4C846E5E338D051C4F /* BikeTrackUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BikeTrackUITests.swift; sourceTree = "<group>"; };
 		3E910FF1EDB661FD33B1950B /* WorkoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutView.swift; sourceTree = "<group>"; };
 		3F0D13C11D54E16351F75337 /* Phosphor-LICENSE.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Phosphor-LICENSE.txt"; sourceTree = "<group>"; };
 		3FCD2E296DCEBE854EB23A0C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -87,6 +86,7 @@
 		B27A1894C22D99EEC729DBC8 /* BikeTrack.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BikeTrack.entitlements; sourceTree = "<group>"; };
 		B559D05AB23051E3C11AD623 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		BB2AAEEAEA196FA0837755D3 /* BikeTrackApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BikeTrackApp.swift; sourceTree = "<group>"; };
+		E038D9961CF9606ECEF1EBCC /* BikeTrackUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BikeTrackUITests.swift; sourceTree = "<group>"; };
 		F138E83C6A8E906C19D88594 /* BikeTrackUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BikeTrackUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		F255C72E704BE53C140D7A8C /* BikeTrack */ = {isa = PBXFileReference; lastKnownFileType = folder; name = BikeTrack; path = .; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
@@ -112,6 +112,14 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
+		2C8DEE78A20CE17257708099 /* UITests */ = {
+			isa = PBXGroup;
+			children = (
+				E038D9961CF9606ECEF1EBCC /* BikeTrackUITests.swift */,
+			);
+			path = UITests;
+			sourceTree = "<group>";
+		};
 		4915CCD3E0E305A3F9509464 /* Views */ = {
 			isa = PBXGroup;
 			children = (
@@ -122,6 +130,23 @@
 				3E910FF1EDB661FD33B1950B /* WorkoutView.swift */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		52CF54C1DFE6E0A880D0BC8C /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				2C8DEE78A20CE17257708099 /* UITests */,
+				90B2FE4E3F0A66526F85A856 /* WatchAppTests */,
+			);
+			path = Tests;
+			sourceTree = "<group>";
+		};
+		90B2FE4E3F0A66526F85A856 /* WatchAppTests */ = {
+			isa = PBXGroup;
+			children = (
+				1612FAE25CDE14831004EE6E /* HealthPersistenceTests.swift */,
+			);
+			path = WatchAppTests;
 			sourceTree = "<group>";
 		};
 		B07766995488F84F9DFEA337 /* Products */ = {
@@ -158,14 +183,6 @@
 			path = WatchApp;
 			sourceTree = "<group>";
 		};
-		DC16BCFEA33BCF46D2F2E857 /* WatchTests */ = {
-			isa = PBXGroup;
-			children = (
-				09256E4AB951C7A15D6C4490 /* HealthPersistenceTests.swift */,
-			);
-			path = WatchTests;
-			sourceTree = "<group>";
-		};
 		EE6BD8A39633FBB2A97C253C /* Services */ = {
 			isa = PBXGroup;
 			children = (
@@ -181,19 +198,10 @@
 			isa = PBXGroup;
 			children = (
 				C115636275571AD4A2DC1B37 /* Packages */,
-				F4820C90866C7B14D12F9F3A /* UITests */,
+				52CF54C1DFE6E0A880D0BC8C /* Tests */,
 				C379A64FADEC7EC5FFDD8606 /* WatchApp */,
-				DC16BCFEA33BCF46D2F2E857 /* WatchTests */,
 				B07766995488F84F9DFEA337 /* Products */,
 			);
-			sourceTree = "<group>";
-		};
-		F4820C90866C7B14D12F9F3A /* UITests */ = {
-			isa = PBXGroup;
-			children = (
-				30848A4C846E5E338D051C4F /* BikeTrackUITests.swift */,
-			);
-			path = UITests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -284,20 +292,16 @@
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
 					0D09E7A96AA0A9BB1E300BF2 = {
-						DevelopmentTeam = 7C45645JW6;
 						ProvisioningStyle = Automatic;
 					};
 					276C639FAF29E73BA39E08EE = {
-						DevelopmentTeam = 7C45645JW6;
 						ProvisioningStyle = Automatic;
 						TestTargetID = 0D09E7A96AA0A9BB1E300BF2;
 					};
 					472A00CB4035395938EEBF78 = {
-						DevelopmentTeam = 7C45645JW6;
 						ProvisioningStyle = Automatic;
 					};
 					C0A3E72E55B350FD9C675C04 = {
-						DevelopmentTeam = 7C45645JW6;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -346,7 +350,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AC7790BE6589ED20B1638DE9 /* BikeTrackUITests.swift in Sources */,
+				C0B184B6130328585E35BBE6 /* BikeTrackUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -354,7 +358,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				304C6FCFBF5C861B5685E264 /* HealthPersistenceTests.swift in Sources */,
+				A5915EA342B4171DEE941AC7 /* HealthPersistenceTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -440,7 +444,6 @@
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = 7C45645JW6;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -620,7 +623,6 @@
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = 7C45645JW6;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
