@@ -8,7 +8,7 @@
   "supportUrl": "https://youssef2430.github.io/BikeTrack/support.html",
   "listingCreated": true,
   "metadataSaved": true,
-  "reviewContactComplete": false,
+  "reviewContactComplete": true,
   "privacyLabelPublished": true,
   "ageRating": "9+",
   "screenshotsPrepared": 5,
@@ -17,12 +17,15 @@
   "coreTestsPassed": 36,
   "uiTestsPassed": 3,
   "blockers": [
-    "Xcode automatic signing reports No Accounts. Sign in to Apple Developer in Xcode Settings > Accounts.",
-    "App Review requires a contact phone number (including country code) and email.",
-    "Chrome browser extension file upload reports Not allowed. Enable Allow access to file URLs or upload the prepared PNGs manually."
+    "Xcode automatic signing reports No Accounts. Desktop control cannot access Xcode's window (cgWindowNotFound); open Xcode Settings > Accounts to continue sign-in.",
+    "Chrome browser extension file upload reports Not allowed. Browser security policy blocks opening chrome://extensions; the user must enable Allow access to file URLs or upload the prepared PNGs manually."
   ],
   "priceConfigured": "Free",
   "availabilityConfigured": "All 175 countries or regions, available on app release",
   "contentRightsSaved": true,
-  "reviewNotesSaved": false
+  "reviewNotesSaved": true,
+  "reviewContactSource": "Reused the existing Gallery Glow App Review contact at the user's request; private details remain only in App Store Connect.",
+  "lastSubmissionValidation": [
+    "You must choose a build."
+  ]
 }
