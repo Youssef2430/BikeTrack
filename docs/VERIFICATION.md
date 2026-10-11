@@ -15,7 +15,9 @@ Release preparation checks on October 10, 2026:
 - Five store screenshots were exported from successful simulator tests, visually checked, and verified as opaque 416 × 496 PNGs. Values in the workout screenshots are simulated demo data.
 - Public privacy and support pages returned HTTP 200 after GitHub Pages deployment.
 
-The unsigned archive is not a signed, uploadable release. Automatic signing/export currently fails because Xcode reports “No Accounts”; the account must be authenticated and appropriate development/distribution provisioning must be generated. No App Store upload or submission is established by these checks.
+On October 11, 2026, Xcode account authentication restored automatic signing and generated the required HealthKit provisioning. The signed archive succeeded at `build-release/BikeTrack.xcarchive`. Apple's upload validation identified two missing companion Settings icons; the existing icon generator produced the required opaque 58 × 58 and 87 × 87 renditions, and the corrected archive contains both in its compiled asset catalog. App Store distribution export and upload then succeeded for `1.0.0 (1)`. All five screenshots and the review contact/notes are saved in App Store Connect. See `AppStore/release-status.json` for the latest processing and submission status.
+
+The processed build was selected and submitted on October 11, 2026. App Store Connect confirmed **1 Item Submitted** and **Waiting for Review** for [submission 63325e41-a937-4942-8b22-c8abbd4bb45d](https://appstoreconnect.apple.com/apps/6821473626/distribution/reviewsubmissions/details/63325e41-a937-4942-8b22-c8abbd4bb45d). The app is configured as free, with automatic release after approval. Submission does not establish Apple approval or public availability.
 
 ## Reference layout and physical installation
 
