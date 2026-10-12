@@ -8,13 +8,15 @@ Scale bands have equal widths for readability; the marker interpolates within it
 
 ## Your profile
 
-Open **Training zones** from Home or Settings. Explicitly save your measured maximum heart rate and cycling functional threshold power (FTP). The picker offers a starting position, but no value becomes a personal setting until you press Save. Clear a value to disable that zone scale. There is no age-based estimate or silent default for real workouts.
+Zones work from the first workout. Until you save your own values, BikeTrack uses typical defaults of 190 bpm maximum heart rate and 200 W cycling functional threshold power (FTP), marked **Default** in **Training zones**. Save your measured maximum heart rate and FTP to replace them, or choose **Use default** to return to the default.
+
+Open **Heart rate zones** or **Power zones** to adjust where each zone starts. Every start must stay between its neighbours, so no zone can disappear. Custom starts are stored as percentages, so they scale when you change your maximum heart rate or FTP. **Use standard zones** restores the boundaries below.
 
 Each workout captures the profile at its start. Later changes do not reclassify old workouts. The demo uses an explicitly simulated 190 bpm maximum and 240 W FTP, independently of personal settings, and never writes its data to Health or history.
 
 ## Boundaries
 
-Heart rate uses percentages of configured maximum heart rate:
+The standard heart-rate zones use percentages of maximum heart rate:
 
 | Band | Range |
 | --- | --- |
@@ -25,7 +27,7 @@ Heart rate uses percentages of configured maximum heart rate:
 | Z4 · Threshold | 80% to below 90% |
 | Z5 · Maximum | 90% and above |
 
-Cycling power uses a seven-band FTP scale:
+Cycling power uses a standard seven-band FTP scale:
 
 | Band | Range |
 | --- | --- |

@@ -12,14 +12,18 @@ final class BikeTrackUITests: XCTestCase {
         app.launchArguments = ["--uitesting"]
         app.launch()
         let settings = app.buttons["settings"]
-        for _ in 0..<7 where !settings.isHittable { app.swipeUp() }
+        for _ in 0..<12 where !settings.isHittable { scrollGently(app) }
         XCTAssertTrue(settings.isHittable)
         settings.tap()
+        let settingsHeader = app.buttons["screenHeader"].firstMatch
+        expectation(for: NSPredicate(format: "label == %@", "Settings"), evaluatedWith: settingsHeader)
+        waitForExpectations(timeout: 5)
         let privacy = app.buttons["privacyPolicy"]
-        for _ in 0..<12 where !privacy.isHittable { app.swipeUp() }
+        for _ in 0..<20 where !privacy.isHittable { scrollGently(app) }
         XCTAssertTrue(privacy.isHittable)
         privacy.tap()
-        XCTAssertTrue(app.navigationBars["Privacy policy"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["screenHeader"].firstMatch.waitForExistence(timeout: 5))
+        XCTAssertEqual(app.buttons["screenHeader"].firstMatch.label, "Privacy policy")
         XCTAssertTrue(app.staticTexts.containing(NSPredicate(format: "label CONTAINS %@", "BikeTrack Privacy Policy")).firstMatch.exists)
         capture(app, name: "Privacy policy")
     }
@@ -85,6 +89,41 @@ final class BikeTrackUITests: XCTestCase {
     }
 
     @MainActor
+    func testLiveOverviewFitsAndPauses() throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["--demo", "--uitesting"]
+        app.launch()
+        XCTAssertTrue(app.staticTexts["DEMO"].waitForExistence(timeout: 15))
+        let power = app.staticTexts["powerLiveReading"]
+        let heart = app.staticTexts["heartRateLiveReading"]
+        let distance = app.descendants(matching: .any)["liveDistance"].firstMatch
+        let cadence = app.descendants(matching: .any)["liveCadence"].firstMatch
+        XCTAssertTrue(power.waitForExistence(timeout: 5))
+        XCTAssertTrue(heart.exists)
+        XCTAssertLessThanOrEqual(power.frame.maxX, heart.frame.minX)
+        XCTAssertEqual(power.frame.minY, heart.frame.minY, accuracy: 1)
+        // Secondary metrics must fit above the page indicator without scrolling,
+        // including on the 162 × 197 pt display of the 40 mm Watch.
+        for element in [distance, cadence] {
+            XCTAssertTrue(element.exists)
+            XCTAssertTrue(element.isHittable)
+            XCTAssertGreaterThan(element.frame.minY, max(power.frame.maxY, heart.frame.maxY))
+            XCTAssertLessThanOrEqual(element.frame.maxY, app.frame.maxY - 14)
+        }
+        Thread.sleep(forTimeInterval: 1)
+        capture(app, name: "Overview live")
+        app.swipeRight()
+        XCTAssertTrue(app.buttons["pauseResume"].waitForExistence(timeout: 5))
+        app.buttons["pauseResume"].tap()
+        app.swipeLeft()
+        XCTAssertTrue(app.staticTexts["PAUSED"].waitForExistence(timeout: 5))
+        XCTAssertTrue(power.label.contains("—"))
+        XCTAssertTrue(heart.label.contains("—"))
+        Thread.sleep(forTimeInterval: 1)
+        capture(app, name: "Overview paused")
+    }
+
+    @MainActor
     func testDemoPauseResumeSaveAndReturnHome() throws {
         let app = XCUIApplication()
         app.launchArguments = ["--demo", "--uitesting"]
@@ -140,10 +179,17 @@ final class BikeTrackUITests: XCTestCase {
         capture(app, name: "Both live zones")
         app.swipeLeft()
         XCTAssertTrue(app.staticTexts["heartRateLiveZone"].waitForExistence(timeout: 5))
+        let metricTitle = app.descendants(matching: .any)["screenHeader"].firstMatch
+        XCTAssertTrue(metricTitle.exists)
+        XCTAssertEqual(metricTitle.label, "Heart rate")
+        // The metric title belongs beside the clock, above the scrolling content.
+        XCTAssertLessThanOrEqual(metricTitle.frame.maxY, app.frame.height * 0.25)
         capture(app, name: "Heart rate trend")
         app.swipeLeft()
         XCTAssertTrue(app.staticTexts["powerLiveZone"].waitForExistence(timeout: 5))
         capture(app, name: "Power trend")
+        expectation(for: NSPredicate(format: "label == %@", "Power"), evaluatedWith: metricTitle)
+        waitForExpectations(timeout: 5)
         scrollGently(app)
         scrollGently(app)
         scrollGently(app)
@@ -153,14 +199,17 @@ final class BikeTrackUITests: XCTestCase {
         app.swipeRight()
         XCTAssertTrue(app.buttons["endWorkout"].waitForExistence(timeout: 5))
         app.buttons["endWorkout"].tap()
-        app.buttons.matching(NSPredicate(format: "label == %@ AND identifier != %@", "End demo", "endWorkout")).firstMatch.tap()
+        let confirmEnd = app.buttons.matching(NSPredicate(format: "label == %@ AND identifier != %@", "End demo", "endWorkout")).firstMatch
+        XCTAssertTrue(confirmEnd.waitForExistence(timeout: 5))
+        confirmEnd.tap()
         XCTAssertTrue(app.staticTexts["summaryTitle"].waitForExistence(timeout: 10))
         let heartChart = app.buttons["heartRateSummaryChart"]
         for _ in 0..<5 where !heartChart.isHittable { app.swipeUp() }
         XCTAssertTrue(heartChart.exists)
         capture(app, name: "Summary charts")
         heartChart.tap()
-        XCTAssertTrue(app.navigationBars["Heart rate"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["screenHeader"].firstMatch.waitForExistence(timeout: 5))
+        XCTAssertEqual(app.buttons["screenHeader"].firstMatch.label, "Heart rate")
         capture(app, name: "Heart rate analysis")
         scrollGently(app)
         XCTAssertTrue(app.otherElements["heartRateZoneScale"].exists)
@@ -177,7 +226,7 @@ final class BikeTrackUITests: XCTestCase {
     }
 
     @MainActor
-    func testTrainingThresholdCanBeSavedAndCleared() throws {
+    func testTrainingThresholdCanBeSavedAndReset() throws {
         #if !targetEnvironment(simulator)
         throw XCTSkip("Profile editing test is limited to the simulator.")
         #else
@@ -194,14 +243,14 @@ final class BikeTrackUITests: XCTestCase {
         for _ in 0..<4 where !save.isHittable { app.swipeUp() }
         save.tap()
         XCTAssertTrue(app.buttons["editMaxHeartRate"].waitForExistence(timeout: 5))
-        XCTAssertFalse(app.buttons["editMaxHeartRate"].label.contains("Set up"))
+        XCTAssertFalse(app.buttons["editMaxHeartRate"].label.localizedCaseInsensitiveContains("default"))
         capture(app, name: "Configured heart rate")
         app.buttons["editMaxHeartRate"].tap()
-        let clear = app.buttons["Clear value"]
-        for _ in 0..<5 where !clear.isHittable { app.swipeUp() }
-        clear.tap()
+        let useDefault = app.buttons["useDefaultThreshold"]
+        for _ in 0..<5 where !useDefault.isHittable { app.swipeUp() }
+        useDefault.tap()
         XCTAssertTrue(app.buttons["editMaxHeartRate"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.buttons["editMaxHeartRate"].label.contains("Set up"))
+        XCTAssertTrue(app.buttons["editMaxHeartRate"].label.localizedCaseInsensitiveContains("default"))
         #endif
     }
 
@@ -214,7 +263,7 @@ final class BikeTrackUITests: XCTestCase {
 
     @MainActor
     private func capture(_ app: XCUIApplication, name: String) {
-        let attachment = XCTAttachment(screenshot: app.screenshot())
+        let attachment = XCTAttachment(data: XCUIScreen.main.screenshot().pngRepresentation, uniformTypeIdentifier: "public.png")
         attachment.name = name
         attachment.lifetime = .keepAlways
         add(attachment)

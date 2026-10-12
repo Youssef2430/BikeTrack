@@ -3,29 +3,14 @@ import Charts
 import RideCore
 
 extension ZoneMetric {
-    var tint: Color { self == .heartRate ? Palette.coral : Palette.blue }
+    var tint: Color { self == .heartRate ? Palette.coral : Palette.lime }
     var symbol: String { self == .heartRate ? "heart.fill" : "bolt.fill" }
 }
 
 extension View {
     func metricCard() -> some View {
-        self.padding(10)
+        self.padding(12)
             .background(Palette.panel, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
-            .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous).strokeBorder(.white.opacity(0.06)))
-    }
-}
-
-struct ZoneStrip: View {
-    let profile: TrainingProfile
-    let metric: ZoneMetric
-    let selected: Int?
-    var body: some View {
-        HStack(spacing: 3) {
-            ForEach(profile.zones(for: metric)) { zone in
-                Capsule().fill(Palette.zone(zone.id).opacity(selected == zone.id ? 1 : 0.22))
-                    .frame(height: selected == zone.id ? 5 : 3)
-            }
-        }.frame(height: 5).accessibilityHidden(true)
     }
 }
 
@@ -101,36 +86,77 @@ struct TrendChart: View {
 struct LiveZoneView: View {
     @EnvironmentObject private var workout: WorkoutController
     let metric: ZoneMetric
+
     var body: some View {
-        TimelineView(.periodic(from: .now, by: 1)) { context in
-            let value = workout.liveValue(for: metric, at: context.date)
-            let zone = workout.analytics.profile.zone(for: value, metric: metric)
-            ScrollView {
-                VStack(alignment: .leading, spacing: 4) {
-                    HStack {
-                        Label(metric.title, systemImage: metric.symbol).foregroundStyle(metric.tint)
-                            .font(.system(size: 12, weight: .semibold))
-                        Spacer(minLength: 2)
-                        if workout.isDemo { Text("DEMO").font(.system(size: 8, weight: .bold)).foregroundStyle(Palette.muted) }
-                    }
-                    VStack(alignment: .leading, spacing: 2) {
-                        HStack(alignment: .firstTextBaseline, spacing: 4) {
-                            Text(formatted(value)).font(.system(size: 26, weight: .semibold, design: .rounded)).monospacedDigit()
-                            Text(metric.unit).font(.caption2).foregroundStyle(Palette.muted)
-                            Spacer(minLength: 0)
+        GeometryReader { geometry in
+            let compact = geometry.size.width < 190
+            TimelineView(.periodic(from: .now, by: 1)) { context in
+                let value = workout.liveValue(for: metric, at: context.date)
+                let zone = workout.analytics.profile.zone(for: value, metric: metric)
+                let timeline = workout.analytics.timeline(for: metric)
+                ScrollView {
+                    VStack(alignment: .leading, spacing: compact ? 5 : 8) {
+                        if metric == .heartRate {
+                            let ribbon: CGFloat = compact ? 22 : 26
+                            VStack(spacing: compact ? 6 : 8) {
+                                // The dial yields height so the zone ribbon clears the page dots.
+                                HeartRateDial(timeline: timeline, value: value,
+                                              caption: workout.phase == .paused ? "PAUSED" : workout.isDemo ? "DEMO" : "LIVE",
+                                              duration: workout.elapsed)
+                                    .frame(maxHeight: max(100, geometry.size.height - ribbon * 1.12 - (compact ? 6 : 8)))
+                                ZoneRibbon(profile: workout.analytics.profile, metric: metric, selected: zone?.id, height: ribbon)
+                                zoneCaption(zone)
+                            }
+                        } else {
+                            VStack(alignment: .leading, spacing: compact ? 5 : 8) {
+                                HStack(spacing: 8) {
+                                    InstrumentNumber(value: MetricFormat.elapsed(workout.elapsed), height: compact ? 22 : 30)
+                                    if workout.phase == .paused { Eyebrow(title: "Paused", color: Palette.coral) }
+                                    else if workout.isDemo { Eyebrow(title: "Demo") }
+                                }
+                                ZoneRibbon(profile: workout.analytics.profile, metric: metric, selected: zone?.id, height: compact ? 22 : 26)
+                                HStack(alignment: .bottom, spacing: 4) {
+                                    InstrumentNumber(value: formatted(value), height: compact ? 30 : 40)
+                                    Eyebrow(title: "Watts", color: metric.tint).padding(.bottom, 3)
+                                }
+                            }
                         }
-                        Text(zone.map { "\($0.label) · \($0.name)" } ?? (workout.phase == .paused ? "Paused" : "No current zone"))
-                            .font(.system(size: 11, weight: .medium)).foregroundStyle(zone.map { Palette.zone($0.id) } ?? Palette.muted)
-                            .accessibilityIdentifier("\(metric.rawValue)LiveZone")
-                        ZoneStrip(profile: workout.analytics.profile, metric: metric, selected: zone?.id)
-                    }
-                    TrendChart(timeline: workout.analytics.timeline(for: metric), metric: metric, profile: workout.analytics.profile, height: 60)
-                    chartTimeLabels(workout.analytics.timeline(for: metric))
-                    ZoneScale(profile: workout.analytics.profile, metric: metric, value: value).padding(.top, 8)
-                    ZoneDistribution(analytics: workout.analytics, metric: metric, duration: workout.elapsed).padding(.top, 12)
-                }.padding(.horizontal, 4).padding(.bottom, 18)
-            }.accessibilityIdentifier("\(metric.rawValue)Insights")
+                        HStack(alignment: .firstTextBaseline) {
+                            VStack(alignment: .leading, spacing: compact ? 3 : 5) {
+                                Eyebrow(title: "Time in zone")
+                                Text(zone.map { MetricFormat.elapsed(timeline.zoneSeconds[$0.id, default: 0]) } ?? "—")
+                                    .font(.system(size: compact ? 21 : 23, weight: .medium, design: .rounded)).monospacedDigit()
+                            }
+                            Spacer(minLength: 4)
+                            VStack(alignment: .trailing, spacing: compact ? 3 : 5) {
+                                Eyebrow(title: "Average")
+                                Text(formatted(timeline.average))
+                                    .font(.system(size: compact ? 21 : 23, weight: .medium, design: .rounded)).monospacedDigit()
+                            }
+                        }
+                        .padding(.top, metric == .heartRate ? 10 : 2)
+                        .padding(.bottom, 2)
+                        if metric == .power { zoneCaption(zone) }
+                        Rectangle().fill(Color(white: 0.16)).frame(height: 1)
+                        VStack(alignment: .leading, spacing: 8) {
+                            Eyebrow(title: "Session trend")
+                            TrendChart(timeline: timeline, metric: metric, profile: workout.analytics.profile, height: 75)
+                            chartTimeLabels(timeline)
+                            ZoneScale(profile: workout.analytics.profile, metric: metric, value: value).padding(.top, 6)
+                        }
+                        ZoneDistribution(analytics: workout.analytics, metric: metric, duration: workout.elapsed).padding(.top, 8)
+                    }.padding(.horizontal, 8).padding(.bottom, 28)
+                }.accessibilityIdentifier("\(metric.rawValue)Insights")
+            }
         }
+    }
+
+    private func zoneCaption(_ zone: TrainingZone?) -> some View {
+        Text(zone.map(\.name) ?? (workout.phase == .paused ? "Paused" : workout.analytics.profile.baseline(for: metric) == nil ? "Set up training zones" : "Waiting for signal"))
+            .font(.system(size: 11, weight: .semibold))
+            .foregroundStyle(zone.map { Palette.zone($0.id) } ?? Palette.muted)
+            .frame(maxWidth: .infinity, alignment: metric == .heartRate ? .center : .leading)
+            .accessibilityIdentifier("\(metric.rawValue)LiveZone")
     }
 }
 
@@ -138,37 +164,42 @@ struct WorkoutInsightsView: View {
     let analytics: WorkoutAnalytics
     let metric: ZoneMetric
     let duration: TimeInterval
+
     var body: some View {
         let timeline = analytics.timeline(for: metric)
         let averageZone = analytics.profile.zone(for: timeline.average, metric: metric)
         ScrollView {
-            VStack(alignment: .leading, spacing: 12) {
+            VStack(alignment: .leading, spacing: 16) {
+                if metric == .heartRate {
+                    HeartRateDial(timeline: timeline, value: timeline.average, caption: "AVG", duration: duration)
+                        .padding(.top, 8)
+                    ZoneRibbon(profile: analytics.profile, metric: metric, selected: averageZone?.id)
+                } else {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Eyebrow(title: "Average power", color: metric.tint)
+                        InstrumentNumber(value: formatted(timeline.average), height: 48, color: metric.tint)
+                        Eyebrow(title: "Watts")
+                    }.padding(.top, 8)
+                }
+                if let averageZone {
+                    Text(metric == .heartRate ? averageZone.name : "\(averageZone.label) · \(averageZone.name)")
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundStyle(Palette.zone(averageZone.id))
+                }
+                ZoneScale(profile: analytics.profile, metric: metric, value: timeline.average)
                 VStack(alignment: .leading, spacing: 8) {
-                    HStack(alignment: .bottom, spacing: 4) {
-                        VStack(alignment: .leading, spacing: 3) {
-                            HStack(alignment: .firstTextBaseline, spacing: 2) {
-                                Text(formatted(timeline.average)).font(.system(size: 25, weight: .semibold, design: .rounded)).monospacedDigit()
-                                Text(metric.unit).font(.system(size: 10)).foregroundStyle(Palette.muted)
-                            }
-                            Text(metric == .heartRate ? "Average HR" : "Average power").font(.system(size: 10)).foregroundStyle(Palette.muted)
-                        }
-                        Spacer(minLength: 0)
-                        if let averageZone {
-                            Text(averageZone.label).font(.system(size: 10, weight: .semibold)).foregroundStyle(Palette.zone(averageZone.id))
-                        }
-                    }
-                    TrendChart(timeline: timeline, metric: metric, profile: analytics.profile, height: 65)
+                    Eyebrow(title: "Session trend")
+                    TrendChart(timeline: timeline, metric: metric, profile: analytics.profile, height: 75)
                     chartTimeLabels(timeline)
-                    ZoneScale(profile: analytics.profile, metric: metric, value: timeline.average)
-                }.metricCard()
+                }.padding(.vertical, 4)
                 ZoneDistribution(analytics: analytics, metric: metric, duration: duration)
                 HStack {
                     Text("Peak \(metric.title.lowercased())").font(.caption2).foregroundStyle(Palette.muted)
                     Spacer(minLength: 3)
                     Text("\(formatted(timeline.peak)) \(metric.unit)").font(.caption2).monospacedDigit()
                 }
-            }.padding(.horizontal, 4).padding(.bottom, 12)
-        }.navigationTitle(metric.title)
+            }.padding(.horizontal, 8).padding(.bottom, 16)
+        }.watchHeader(metric.title, tint: metric.tint, showsBackButton: true)
     }
 }
 
@@ -180,7 +211,7 @@ struct ZoneDistribution: View {
     private var timeline: MetricTimeline { analytics.timeline(for: metric) }
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Time in zones").font(.system(size: 15, weight: .semibold))
+            Text("Time in zones").font(.system(size: 16, weight: .semibold, design: .rounded))
             if let baseline = analytics.profile.baseline(for: metric) {
                 Text("\(metric == .heartRate ? "Max HR" : "FTP") \(Int(baseline)) \(metric.unit)")
                     .font(.caption2).foregroundStyle(Palette.muted)
@@ -223,8 +254,8 @@ struct ZoneDistribution: View {
                         Text("Zone ranges")
                         Spacer()
                         Image(systemName: showRanges ? "chevron.up" : "chevron.down")
-                    }.font(.system(size: 11))
-                }.accessibilityIdentifier("\(metric.rawValue)ZoneRanges")
+                    }.font(.system(size: 11)).padding(.horizontal, 12)
+                }.buttonStyle(RideButtonStyle(tint: .white)).accessibilityIdentifier("\(metric.rawValue)ZoneRanges")
                 if showRanges {
                     ForEach(analytics.profile.zones(for: metric)) { zone in
                         HStack {
@@ -301,14 +332,6 @@ struct ZoneScale: View {
 }
 
 func formatted(_ value: Double?) -> String { value.map { String(format: "%.0f", $0) } ?? "—" }
-
-func compactStat(_ label: String, value: String, unit: String, tint: Color) -> some View {
-    VStack(alignment: .leading, spacing: 3) {
-        Text(label).font(.system(size: 10)).foregroundStyle(Palette.muted)
-        Text(value).font(.system(size: 25, weight: .semibold, design: .rounded)).foregroundStyle(tint).monospacedDigit()
-        Text(unit).font(.system(size: 9)).foregroundStyle(Palette.muted)
-    }
-}
 
 func chartTimeLabels(_ timeline: MetricTimeline) -> some View {
     HStack {

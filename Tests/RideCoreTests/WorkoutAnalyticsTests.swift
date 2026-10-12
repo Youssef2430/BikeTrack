@@ -18,6 +18,22 @@ struct WorkoutAnalyticsTests {
         #expect(TrainingProfile(maximumHeartRate: -1, functionalThresholdPower: .infinity).zones(for: .power).isEmpty)
     }
 
+    @Test func customZoneStartsScaleWithTheBaselineAndInvalidOnesFallBack() throws {
+        let custom = TrainingProfile(maximumHeartRate: 200, functionalThresholdPower: 200,
+                                     heartRateEdges: [0.55, 0.65, 0.72, 0.85, 0.93])
+        #expect(custom.zones(for: .heartRate).map(\.lowerBound) == [0, 110, 130, 144, 170, 186])
+        #expect(custom.zone(for: 143.9, metric: .heartRate)?.id == 2)
+        #expect(custom.zone(for: 144, metric: .heartRate)?.id == 3)
+        #expect(custom.zones(for: .power) == profile.zones(for: .power))
+        for edges in [[0.5, 0.6], [0.6, 0.5, 0.7, 0.8, 0.9], [0.5, 0.6, 0.7, 0.8, .nan]] {
+            #expect(TrainingProfile(maximumHeartRate: 200, heartRateEdges: edges).heartRateEdges == nil)
+        }
+        // Profiles saved before custom zones existed still decode with the standard scheme.
+        let legacy = try JSONDecoder().decode(TrainingProfile.self, from: Data(#"{"maximumHeartRate":200}"#.utf8))
+        #expect(legacy.zones(for: .heartRate) == profile.zones(for: .heartRate))
+        #expect(try JSONDecoder().decode(TrainingProfile.self, from: JSONEncoder().encode(custom)) == custom)
+    }
+
     @Test func accountsForZoneTransitionsAndNeverDoubleCountsTicks() {
         var recorder = AnalyticsRecorder(profile: profile)
         recorder.observe(100, metric: .power, at: 0)

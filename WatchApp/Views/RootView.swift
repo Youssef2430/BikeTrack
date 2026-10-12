@@ -1,21 +1,6 @@
 import SwiftUI
 import RideCore
 
-enum Palette {
-    static let lime = Color(red: 0.77, green: 0.98, blue: 0.32)
-    static let coral = Color(red: 1, green: 0.66, blue: 0.51)
-    static let blue = Color(red: 0.65, green: 0.75, blue: 1)
-    static let panel = Color(red: 0.09, green: 0.10, blue: 0.12)
-    static let muted = Color(red: 0.66, green: 0.69, blue: 0.73)
-
-    static func zone(_ id: Int) -> Color {
-        [Color(red: 0.67, green: 0.74, blue: 1), Color(red: 0.18, green: 0.55, blue: 1),
-         Color(red: 1, green: 0.80, blue: 0), Color(red: 1, green: 0.61, blue: 0.08),
-         Color(red: 1, green: 0.27, blue: 0.30), Color(red: 0.63, green: 0.36, blue: 1),
-         Color(red: 0.87, green: 0.39, blue: 0.86), Color(red: 1, green: 0.58, blue: 0.74)][min(7, max(0, id))]
-    }
-}
-
 struct RootView: View {
     @EnvironmentObject private var workout: WorkoutController
 
@@ -26,12 +11,13 @@ struct RootView: View {
             case .preparing: ProgressView("Getting ready…")
             case .running, .paused: WorkoutView()
             case .ending, .saving: ProgressView("Saving workout…")
-            case .saveFailed: SaveFailureView()
+            case .saveFailed: NavigationStack { SaveFailureView() }
             case .summary:
                 if let summary = workout.summary { NavigationStack { SummaryView(record: summary, dismiss: workout.reset) } }
             }
         }
         .background(Color.black)
+        .preferredColorScheme(.dark)
         .alert("BikeTrack", isPresented: Binding(
             get: { workout.errorMessage != nil && workout.phase != .saveFailed },
             set: { if !$0 { workout.errorMessage = nil } }
@@ -54,7 +40,7 @@ struct HomeView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 12) {
+            VStack(spacing: 10) {
                 if let recovery = workout.recoveryRecord {
                     VStack(alignment: .leading, spacing: 8) {
                         Label("Unfinished workout", systemImage: "exclamationmark.arrow.circlepath")
@@ -66,76 +52,101 @@ struct HomeView: View {
                     }
                 } else {
                     HStack(spacing: 10) {
-                        Image(systemName: activity.symbol)
-                            .font(.system(size: 24, weight: .medium))
-                            .foregroundStyle(Palette.lime)
-                            .frame(width: 46, height: 46)
-                            .background(Palette.lime.opacity(0.12), in: Circle())
-                        VStack(alignment: .leading, spacing: 3) {
+                        ActivityEmblem(symbol: activity.symbol, size: 38)
+                        VStack(alignment: .leading, spacing: 4) {
                             Text(activity == .cycling ? "Just ride." : "Let's move.")
-                                .font(.system(size: 23, weight: .bold, design: .rounded))
+                                .font(.system(size: 26, weight: .bold, design: .rounded))
                                 .lineLimit(1).minimumScaleFactor(0.7)
-                            Text(activity.title).font(.caption2).foregroundStyle(Palette.muted)
+                            Eyebrow(title: activity.title)
                         }
                         Spacer(minLength: 0)
+                    }.padding(.vertical, 2)
+                    Button {
+                        Task { await workout.start(activity: activity) }
+                    } label: {
+                        Label(activity == .cycling ? "Start ride" : "Start workout", systemImage: "play.fill")
                     }
+                    .buttonStyle(RideButtonStyle(prominent: true))
+                    .disabled(!bluetooth.connected || !equipmentMatches)
+                    .accessibilityIdentifier("startWorkout")
                     NavigationLink {
                         EquipmentView()
                     } label: {
                         HStack(spacing: 8) {
                             Image(systemName: bluetooth.connected ? "checkmark.circle.fill" : "antenna.radiowaves.left.and.right")
-                                .foregroundStyle(bluetooth.connected ? Palette.lime : Palette.blue)
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(bluetooth.selectedName ?? "Connect equipment").font(.system(size: 13, weight: .semibold))
-                                Text(bluetooth.connected ? "Ready to go" : "Bike or treadmill")
-                                    .font(.system(size: 11)).foregroundStyle(Palette.muted)
+                                .foregroundStyle(Palette.lime)
+                                .font(.system(size: 14))
+                            VStack(alignment: .leading, spacing: 3) {
+                                Text(bluetooth.selectedName ?? "Connect")
+                                    .font(.system(size: 12, weight: .semibold)).lineLimit(2)
+                                Text(bluetooth.connected ? "Connected · ready" : "Bluetooth")
+                                    .font(.system(size: 10)).foregroundStyle(Palette.muted)
                             }
                             Spacer(minLength: 0)
-                        }.padding(.vertical, 3)
-                    }.accessibilityIdentifier("connectEquipment")
-                    Button {
-                        Task { await workout.start(activity: activity) }
-                    } label: {
-                        Label(activity == .cycling ? "Start ride" : "Start workout", systemImage: "play.fill")
-                            .font(.headline).frame(maxWidth: .infinity)
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .tint(Palette.lime).foregroundStyle(.black)
-                    .disabled(!bluetooth.connected || !equipmentMatches)
-                    .accessibilityIdentifier("startWorkout")
+                            Image(systemName: "chevron.right").font(.system(size: 9, weight: .semibold)).foregroundStyle(Palette.muted)
+                        }.padding(10).frame(maxWidth: .infinity, minHeight: 46, alignment: .leading)
+                            .background(Palette.panel, in: RoundedRectangle(cornerRadius: 16))
+                    }.buttonStyle(.plain).accessibilityIdentifier("connectEquipment")
                     if bluetooth.connected && !equipmentMatches {
                         Text("Choose a workout that matches your connected equipment.").font(.caption2).foregroundStyle(Palette.muted)
                     }
-                    Picker("Workout", selection: $activity) {
-                        ForEach(ActivityKind.allCases) { kind in Text(kind.title).tag(kind) }
+                    NavigationLink { ActivitySelectionView(selection: $activity) } label: {
+                        HStack {
+                            Text("Workout")
+                            Spacer(minLength: 4)
+                            Text(activity.title).font(.caption2).foregroundStyle(Palette.muted)
+                        }
                     }
-                    .pickerStyle(.navigationLink)
                     .accessibilityIdentifier("activityPicker")
                     Button("Record without equipment") { Task { await workout.start(activity: activity) } }
-                        .font(.caption2).buttonStyle(.plain).foregroundStyle(Palette.muted)
+                        .font(.system(size: 11)).buttonStyle(.plain).foregroundStyle(Palette.muted)
+                        .frame(maxWidth: .infinity, minHeight: 34)
                 }
-                HStack {
-                    NavigationLink { HistoryView() } label: { Image(systemName: "clock.arrow.circlepath") }
-                        .accessibilityLabel("Workout history")
-                    NavigationLink { SettingsView() } label: { Image(systemName: "slider.horizontal.3") }
-                        .accessibilityLabel("Settings")
-                        .accessibilityIdentifier("settings")
-                }
+                Rectangle().fill(Color(white: 0.16)).frame(height: 1).padding(.vertical, 2)
+                HStack(spacing: 8) {
+                    NavigationLink { HistoryView() } label: {
+                        Label("History", systemImage: "clock.arrow.circlepath").font(.system(size: 10, weight: .medium))
+                    }.accessibilityLabel("Workout history")
+                    NavigationLink { SettingsView() } label: {
+                        Label("Settings", systemImage: "slider.horizontal.3").font(.system(size: 10, weight: .medium))
+                    }.accessibilityLabel("Settings").accessibilityIdentifier("settings")
+                }.buttonStyle(RideButtonStyle(tint: .white))
                 NavigationLink { ZoneSettingsView() } label: {
                     Label("Training zones", systemImage: "chart.bar.xaxis")
                         .font(.system(size: 13, weight: .medium))
-                }.accessibilityIdentifier("trainingZones")
+                }.buttonStyle(RideButtonStyle(tint: Palette.muted)).accessibilityIdentifier("trainingZones")
                 Button("Try demo ride") { Task { await workout.start(activity: activity, demo: true) } }
-                    .font(.caption2).foregroundStyle(Palette.muted).buttonStyle(.plain)
+                    .font(.system(size: 11)).foregroundStyle(Palette.lime).buttonStyle(.plain)
+                    .frame(maxWidth: .infinity, minHeight: 34)
                     .disabled(!workout.canStart)
                     .accessibilityIdentifier("demoRide")
-            }.padding(.horizontal, 2).padding(.bottom, 10)
+            }.padding(.horizontal, 7).padding(.bottom, 16)
         }
-        .navigationTitle("BikeTrack")
-        .toolbarTitleDisplayMode(.inline)
+        .watchHeader("BikeTrack", symbol: "bicycle")
         .confirmationDialog("Discard the unfinished local workout?", isPresented: $confirmRecoveryDiscard, titleVisibility: .visible) {
             Button("Discard", role: .destructive) { workout.dismissRecovery() }
         }
+    }
+}
+
+private struct ActivitySelectionView: View {
+    @Binding var selection: ActivityKind
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        List(ActivityKind.allCases) { activity in
+            Button {
+                selection = activity
+                dismiss()
+            } label: {
+                HStack(spacing: 8) {
+                    Label(activity.title, systemImage: activity.symbol)
+                        .font(.system(size: 13, weight: .medium))
+                    Spacer(minLength: 0)
+                    if selection == activity { Image(systemName: "checkmark").foregroundStyle(Palette.lime) }
+                }
+            }.listRowBackground(Palette.panel)
+        }.watchHeader("Workout", showsBackButton: true)
     }
 }
 
@@ -167,7 +178,7 @@ struct EquipmentView: View {
                     .font(.footnote).foregroundStyle(Palette.muted)
             }
         }
-        .navigationTitle("Equipment")
+        .watchHeader("Equipment", showsBackButton: true)
         .onAppear { if !bluetooth.connected && bluetooth.selectedName == nil { bluetooth.scan() } }
         .onDisappear { bluetooth.stopScan() }
     }
