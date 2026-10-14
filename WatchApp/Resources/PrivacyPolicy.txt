@@ -22,5 +22,5 @@ Support and external pages
 If you contact the developer or share a diagnostic log, you choose what to disclose. The recipient receives that information through the service you select. GitHub hosts the public support and policy pages under its own privacy policy. GitHub issues are public: do not post private health data or personal details there.
 
 Changes and contact
-This policy will be updated if the app's data practices change. For questions, visit https://github.com/Youssef2430/BikeTrack/issues.
-The current policy is also available at https://youssef2430.github.io/BikeTrack/privacy.html.
+This policy will be updated if the app's data practices change. For questions, visit https://github.com/yssf-c/BikeTrack/issues.
+The current policy is also available at https://yssf-c.github.io/BikeTrack/privacy.html.

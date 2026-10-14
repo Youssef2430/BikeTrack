@@ -1,6 +1,6 @@
 # BikeTrack website
 
-Source lives in `src/`; `scripts/build-production.mjs` generates the public site in `../docs/`. GitHub Pages publishes `main:/docs` at [youssef2430.github.io/BikeTrack](https://youssef2430.github.io/BikeTrack/).
+Source lives in `src/`; `scripts/build-production.mjs` generates the public site in `../docs/`. GitHub Pages publishes `main:/docs` at [yssf-c.github.io/BikeTrack](https://yssf-c.github.io/BikeTrack/).
 
 ```sh
 cd website

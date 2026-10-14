@@ -50,7 +50,7 @@ struct PrivacyPolicyView: View {
     private var policy: String {
         guard let url = Bundle.main.url(forResource: "PrivacyPolicy", withExtension: "txt"),
               let text = try? String(contentsOf: url, encoding: .utf8) else {
-            return "Read the BikeTrack privacy policy at https://youssef2430.github.io/BikeTrack/privacy.html"
+            return "Read the BikeTrack privacy policy at https://yssf-c.github.io/BikeTrack/privacy.html"
         }
         return text
     }
