@@ -4,12 +4,71 @@ on:
   push:
     branches: [main]
   pull_request:
+    branches: [main]
 
 permissions:
   contents: read
 
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  checks:
+  core:
+    name: Swift tests (${{ matrix.configuration }})
+    runs-on: macos-15
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        configuration: [debug, release]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - run: swift test --configuration "${{ matrix.configuration }}"
+
+  watchos:
+    name: watchOS build
+    runs-on: macos-15
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Compile the Watch app and all test targets
+        run: >-
+          xcodebuild -quiet -project BikeTrack.xcodeproj -scheme BikeTrack
+          -destination 'generic/platform=watchOS Simulator'
+          -derivedDataPath build-ci CODE_SIGNING_ALLOWED=NO build-for-testing
+      - name: Build the release distribution container and embedded Watch app
+        run: >-
+          xcodebuild -quiet -project BikeTrack.xcodeproj -scheme BikeTrackStore
+          -configuration Release -destination 'generic/platform=iOS'
+          -derivedDataPath build-ci CODE_SIGNING_ALLOWED=NO build
+
+  website:
+    name: Website validation
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '22'
+      - name: Build and validate the published site
+        run: |
+          npm --prefix website run build
+          node --check docs/biketrack/site.js
+          python3 -m unittest discover -s website/scripts/tests
+          python3 website/scripts/check-site.py
+          git diff --exit-code -- docs
+          test -z "$(git ls-files --others --exclude-standard docs)"
+
+  hygiene:
+    name: Repository hygiene
     runs-on: macos-15
     timeout-minutes: 15
     steps:
@@ -17,19 +76,29 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-        with:
-          node-version: '22'
-      - name: Test core package
-        run: swift test
-      - name: Verify generated website
-        run: |
-          npm --prefix website run build
-          git diff --exit-code -- docs
-          test -z "$(git ls-files --others --exclude-standard docs)"
-      - name: Scan Git history for credentials
+      - name: Install validators
         env:
           HOMEBREW_NO_AUTO_UPDATE: '1'
+        run: brew install actionlint gitleaks
+      - name: Validate GitHub Actions workflows
+        run: actionlint
+      - name: Scan Git history for credentials
+        run: gitleaks git . --log-opts=--all --redact=100 --no-banner
+
+  checks:
+    name: checks
+    if: always()
+    needs: [core, watchos, website, hygiene]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Require every CI job to pass
+        env:
+          RESULTS: ${{ toJSON(needs.*.result) }}
         run: |
-          command -v gitleaks >/dev/null || brew install gitleaks
-          gitleaks git . --log-opts=--all --redact=100 --no-banner
+          python3 - <<'PY'
+          import json, os
+          results = json.loads(os.environ['RESULTS'])
+          if len(results) != 4 or any(result != 'success' for result in results):
+              raise SystemExit(f'Required CI jobs did not all pass: {results}')
+          PY
