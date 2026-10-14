@@ -10,6 +10,7 @@ xcuserdata/
 *.ipa
 *.dSYM/
 node_modules/
+__pycache__/
 website/dist/
 assets/screenshots/**/raw*/
 .DS_Store
